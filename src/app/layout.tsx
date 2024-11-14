@@ -22,8 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <head>
-        <title>EduAI Teacher</title>
-        <meta name="description" content="Edu AI-Admin" />
+        <title>EduAI Parent</title>
+        <meta name="description" content="Edu AI-Parent" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       </head>
       <body className="bg-bgSecondary">
