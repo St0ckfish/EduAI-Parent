@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AiFillHome } from "react-icons/ai";
-import { RiCalendarScheduleFill } from "react-icons/ri";
 import { FiFlag } from "react-icons/fi";
-import { HiOutlineSquares2X2 } from "react-icons/hi2";
 import { FaBusAlt } from "react-icons/fa";
-import { GiArtificialIntelligence } from "react-icons/gi";
-import { CiSquareCheck, CiDollar } from "react-icons/ci";
+import { CiDollar, CiStar } from "react-icons/ci";
+import { FaGraduationCap } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
+import { PiExam } from "react-icons/pi";
+import { IoPersonOutline } from "react-icons/io5";
 
 const useWindowDimensions = () => {
   const isClient = typeof window === "object";
@@ -82,19 +82,9 @@ const NavBar = () => {
   const url = usePathname();
   const [small, setSmall] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpen5, setIsOpen5] = useState(false);
-  const toggleNavbar5 = () => {
-    setIsOpen5(!isOpen5);
-  };
 
   const toggleNavbarSmall = () => {
     setSmall(!small);
-    if (!small == true) {
-      setIsOpen5(true);
-    }
-    if (small == true) {
-      setIsOpen5(false);
-    }
   };
 
   const OpenSideBar = () => {
@@ -111,12 +101,13 @@ const NavBar = () => {
 
   const navLinks = [
     { href: "/", icon: AiFillHome, label: "Home" },
-    { href: "/schedule", icon: RiCalendarScheduleFill, label: "My Schedule" },
+    { href: "/followup", icon: IoPersonOutline, label: "Follow-up" },
     { href: "/bus", icon: FaBusAlt, label: "Bus Tracker" },
     { href: "/finance", icon: CiDollar, label: "Finance" },
-    { href: "/ai", icon: GiArtificialIntelligence, label: "AI Exercise" },
+    { href: "/academic", icon: FaGraduationCap, label: "Academic" },
+    { href: "/exam", icon: PiExam, label: "Exam" },
+    { href: "/grades", icon: CiStar, label: "Grades" },
     { href: "/complaint", icon: FiFlag, label: "Complaint" },
-    { href: "/attendance", icon: CiSquareCheck, label: "My attendance" },
   ];
 
   return (
@@ -333,64 +324,6 @@ const NavBar = () => {
                       url={url}
                     />
                   ))}
-                  <li className="group relative">
-                    <button
-                      onClick={toggleNavbar5}
-                      className={`flex ${!small ? "w-full" : ""} text-md group mt-4 items-center gap-x-3.5 rounded-lg px-2.5 py-2 font-sans font-bold text-secondary hover:bg-bgSecondary hover:text-primary`}
-                    >
-                      <HiOutlineSquares2X2
-                        className={`h-10 w-10 ${small ? "h-6 w-6" : "pl-4"} ${isOpen5 ? `${small ? "" : "border-l-2"} border-primary text-primary` : ""} text-black`}
-                      />
-                      {!small && (
-                        <p
-                          className={`text-black ${isOpen5 ? "text-primary" : ""}`}
-                        >
-                          Menu
-                        </p>
-                      )}
-                    </button>
-                    {isOpen5 && (
-                      <ul
-                        className={`${small ? "hidden w-fit translate-x-5 whitespace-nowrap rounded-xl bg-bgPrimary p-2 group-hover:grid" : ""} mx-9 mt-2 grid gap-2 text-[14px] font-semibold`}
-                      >
-                        <Link
-                          className={`hover:text-primary ${url === "/homework" ? "text-primary" : ""}`}
-                          href="/homework"
-                        >
-                          {" "}
-                          Homework{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/textbooks" ? "text-primary" : ""}`}
-                          href="/textbooks"
-                        >
-                          {" "}
-                          Textbooks{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/grades" ? "text-primary" : ""}`}
-                          href="/grades"
-                        >
-                          {" "}
-                          Grades{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/exam" ? "text-primary" : ""}`}
-                          href="/exam"
-                        >
-                          {" "}
-                          Exam{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/exercises" ? "text-primary" : ""}`}
-                          href="/exercises"
-                        >
-                          {" "}
-                          Exercises{" "}
-                        </Link>
-                      </ul>
-                    )}
-                  </li>
                 </ul>
               </nav>
             </div>

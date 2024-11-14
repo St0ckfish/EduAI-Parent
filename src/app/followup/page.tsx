@@ -18,7 +18,7 @@ function CalendarDemo() {
   );
 }
 
-const Schedule = () => {
+const FollowUp = () => {
   return (
     <Container>
       <div className="mb-4 flex w-full gap-10 max-[1080px]:grid">
@@ -259,4 +259,4 @@ const Schedule = () => {
   );
 };
 
-export default Schedule;
+export default FollowUp;
