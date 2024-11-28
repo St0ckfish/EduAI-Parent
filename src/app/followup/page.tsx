@@ -1,260 +1,413 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import Container from "~/_components/Container";
 import * as React from "react";
-import { Calendar } from "~/components/ui/calendar";
+import Box from "~/_components/Box";
 import Button from "~/_components/Button";
-
-function CalendarDemo() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-
-  return (
-    <Calendar
-      mode="single"
-      selected={date}
-      onSelect={setDate}
-      className="flex w-fit justify-center rounded-md max-[1080px]:w-full"
-    />
-  );
-}
+import SearchableSelect from "~/_components/SearchSelect";
+import { Controller, useForm } from "react-hook-form";
+import { Text } from "~/_components/Text";
+import * as RadioGroup from "@radix-ui/react-radio-group";
+import { useState } from "react";
+import Image from "next/image";
+import BoxGrid from "~/_components/BoxGrid";
+import { RiArrowRightSLine } from "react-icons/ri";
 
 const FollowUp = () => {
+  const { control } = useForm({
+    shouldUnregister: false,
+  });
+
+  const names = [
+    {
+      value: "name-1",
+      label: "Name 1",
+    },
+    {
+      value: "name-2",
+      label: "Name 2",
+    },
+  ];
+
+  const [selectedGrade, setSelectedGrade] = useState<string>("mathematics");
+
+  const subjects = [
+    {
+      value: "mathematics",
+      label: "Mathematics",
+      score: 80.5,
+      assignments: [
+        { name: "HomeWork1", score: 81, weight: 10 },
+        { name: "Quiz1", score: 81, weight: 10 },
+        { name: "Midterm Exam", score: 81, weight: 10 },
+        { name: "Project", score: 81, weight: 10 },
+        { name: "Final Exam", score: 81, weight: 10 },
+      ],
+      historicalAssignments: [
+        { name: "Spring Term - 2024", score: 80 },
+        { name: "Winter Term - 2024", score: 80 },
+        { name: "Spring Term - 2023", score: 80 },
+      ],
+      teacherComments: [
+        {
+          name: "Mahmoud Alaa Eldeen",
+          imgUrl: "/images/userr.png",
+          comment: "Great improvement in the project. Keep up the good work!",
+        },
+      ],
+    },
+    {
+      value: "english",
+      label: "English",
+      score: 85.2,
+      assignments: [
+        { name: "HomeWork1", score: 90, weight: 10 },
+        { name: "Quiz1", score: 85, weight: 10 },
+        { name: "Midterm Exam", score: 83, weight: 10 },
+        { name: "Project", score: 87, weight: 10 },
+        { name: "Final Exam", score: 88, weight: 10 },
+      ],
+      historicalAssignments: [
+        { name: "Spring Term - 2024", score: 87 },
+        { name: "Winter Term - 2024", score: 86 },
+        { name: "Spring Term - 2023", score: 84 },
+      ],
+      teacherComments: [
+        {
+          name: "Teacher 2",
+          imgUrl: "/images/userr.png",
+          comment: "Well done, keep it up!",
+        },
+      ],
+    },
+    {
+      value: "history",
+      label: "History",
+      score: 75.8,
+      assignments: [
+        { name: "HomeWork1", score: 78, weight: 10 },
+        { name: "Quiz1", score: 70, weight: 10 },
+        { name: "Midterm Exam", score: 75, weight: 10 },
+        { name: "Project", score: 77, weight: 10 },
+        { name: "Final Exam", score: 80, weight: 10 },
+      ],
+      historicalAssignments: [
+        { name: "Spring Term - 2024", score: 74 },
+        { name: "Winter Term - 2024", score: 72 },
+        { name: "Spring Term - 2023", score: 76 },
+      ],
+      teacherComments: [
+        {
+          name: "Teacher 3",
+          imgUrl: "/images/userr.png",
+          comment: "You can improve with more effort.",
+        },
+      ],
+    },
+    {
+      value: "french",
+      label: "French",
+      score: 90.1,
+      assignments: [
+        { name: "HomeWork1", score: 92, weight: 10 },
+        { name: "Quiz1", score: 89, weight: 10 },
+        { name: "Midterm Exam", score: 94, weight: 10 },
+        { name: "Project", score: 90, weight: 10 },
+        { name: "Final Exam", score: 93, weight: 10 },
+      ],
+      historicalAssignments: [
+        { name: "Spring Term - 2024", score: 92 },
+        { name: "Winter Term - 2024", score: 91 },
+        { name: "Spring Term - 2023", score: 90 },
+      ],
+      teacherComments: [
+        {
+          name: "Teacher 4",
+          imgUrl: "/images/userr.png",
+          comment: "Excellent work, keep it up!",
+        },
+      ],
+    },
+  ];
+
+  const handleGradeChange = (gradeValue: string) => {
+    setSelectedGrade(gradeValue);
+  };
+
+  // Get the selected subject data
+  const selectedSubject = subjects.find(
+    (subject) => subject.value === selectedGrade,
+  );
+
   return (
     <Container>
-      <div className="mb-4 flex w-full gap-10 max-[1080px]:grid">
-        <div className="flex">
-          <CalendarDemo />
+
+      <div className="mb-8 flex justify-between">
+        <div>
+          <Controller
+            name="schoolId"
+            control={control}
+            rules={{ required: "School selection is required" }}
+            defaultValue="" // Initialize with a default value
+            render={({ field: { onChange, value } }) => (
+              <SearchableSelect
+                // error={errors.schoolId?.message?.toString() ?? ""}
+                value={value}
+                onChange={onChange}
+                placeholder="Select School"
+                options={names}
+                border="border-borderPrimary"
+              />
+            )}
+          />
         </div>
 
-        <div className="flex w-full overflow-auto rounded-md bg-white p-4">
-          <div className="relative w-full overflow-auto sm:rounded-lg">
-            <p className="mb-3 font-semibold">Today’s sessions</p>
-            <table className="w-full overflow-x-auto p-4 text-left text-sm text-black">
-              <thead className="bg-thead text-textPrimary text-xs uppercase">
-                <tr>
-                  <th scope="col" className="whitespace-nowrap px-6 py-3">
-                    Class
-                  </th>
-                  <th scope="col" className="whitespace-nowrap px-6 py-3">
-                    Subject
-                  </th>
-                  <th scope="col" className="whitespace-nowrap px-6 py-3">
-                    Time
-                  </th>
-                  <th scope="col" className="whitespace-nowrap px-6 py-3">
-                    Duration
+        <div>
+          <Button>+ Add Another Child</Button>
+        </div>
+      </div>
+
+      <BoxGrid>
+        <Box>
+          <div className="flex justify-between">
+            <div className="flex gap-6">
+              <div>
+                <Image
+                  src={"/images/userr.png"}
+                  alt="student Photo"
+                  width={75}
+                  height={75}
+                />
+              </div>
+              <div>
+                <Text font={"bold"} size={"xl"}>
+                  Khadija Yassine Hamdallah
+                </Text>
+                <Text color={"gray"} font={"semiBold"} className="mt-4">
+                  @khadija_yassine
+                </Text>
+              </div>
+            </div>
+            <div>
+              <Text font={"bold"} color={"gray"}>
+                Grade 5
+              </Text>
+            </div>
+          </div>
+        </Box>
+        <Box>
+          <div className="flex items-center justify-between">
+            <div>
+              <Text font={"bold"} size={"xl"}>
+                Daily plan
+              </Text>
+              <div className="mt-4 flex gap-2">
+                <Text font={"bold"} color={"success"} size={"xl"}>
+                  95%
+                </Text>
+                <div className="mt-1">
+                  <Image
+                    src={"/images/winner.png"}
+                    alt="student Photo"
+                    width={20}
+                    height={20}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-1">
+              <Text color={"primary"} font={"semiBold"}>
+                Show details
+              </Text>
+              <RiArrowRightSLine className="text-primary" size={25} />
+            </div>
+          </div>
+        </Box>
+        <Box>
+          <Text font={"bold"} size={"xl"}>
+            Upcoming Events
+          </Text>
+          <div className="mt-4 flex justify-between border-l-4 border-warning p-4">
+            <div>
+              <Text>Art Day</Text>
+              <Text color={"gray"}>Tomorrow</Text>
+            </div>
+            <div className="flex flex-col items-end">
+              <Text>2:00 PM</Text>
+              <Text>21 may,2024</Text>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-between border-l-4 border-info p-4">
+            <div>
+              <Text>Art Day</Text>
+              <Text color={"gray"}>Tomorrow</Text>
+            </div>
+            <div className="flex flex-col items-end">
+              <Text>2:00 PM</Text>
+              <Text>21 may,2024</Text>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-between border-l-4 border-warning p-4">
+            <div>
+              <Text>Art Day</Text>
+              <Text color={"gray"}>Tomorrow</Text>
+            </div>
+            <div className="flex flex-col items-end">
+              <Text>2:00 PM</Text>
+              <Text>21 may,2024</Text>
+            </div>
+          </div>
+        </Box>
+        <Box>
+          <Text font={"bold"} size={"xl"}>
+            Academic Progress
+          </Text>
+          <Text font={"bold"} color={"gray"}>
+            This Semester
+          </Text>
+          <BoxGrid className="mt-4">
+            <Box shadow="md">
+              <Text color={"gray"}>GPA</Text>
+              <Text font={"semiBold"}>5.8</Text>
+              <Text color={"success"}>+1.3</Text>
+            </Box>
+            <Box shadow="md">
+              <Text color={"gray"}>Attendance</Text>
+              <Text font={"semiBold"}>84%</Text>
+              <Text color={"error"}>-3%</Text>
+            </Box>
+            <Box shadow="md">
+              <Text color={"gray"}>Class Participation</Text>
+              <Text font={"semiBold"}>Good</Text>
+              <Text color={"success"}>+3</Text>
+            </Box>
+            <Box shadow="md">
+              <Text color={"gray"}>Student Behavior</Text>
+              <Text font={"semiBold"}>Good</Text>
+              <Text color={"success"}>+4</Text>
+            </Box>
+          </BoxGrid>
+        </Box>
+      </BoxGrid> 
+
+      <div className="mt-6">
+
+  <Box>
+    <Text font={"bold"} size={"xl"}>
+      Grade Book
+    </Text>
+    <div className="flex w-full justify-start gap-8 rounded-xl bg-bgPrimary p-8">
+      <div className="w-1/5">
+        <RadioGroup.Root
+          className="gap-4"
+          value={selectedGrade}
+          onValueChange={handleGradeChange}
+          aria-label="Grade Selection"
+        >
+          {subjects.map(({ value, label }) => (
+            <RadioGroup.Item
+              key={value}
+              value={value}
+              className="bg-lightGray group mt-1 flex h-20 w-full flex-col justify-center rounded-l-2xl px-4 text-center text-textPrimary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+              aria-labelledby={`${value}-label`}
+            >
+              <span
+                id={`${value}-label`}
+                className="text-xl font-semibold group-data-[state=checked]:text-white"
+              >
+                {label}
+              </span>
+            </RadioGroup.Item>
+          ))}
+        </RadioGroup.Root>
+      </div>
+
+      <div className="w-4/5">
+        {/* Display the selected subject's assignments */}
+        {selectedSubject && (
+          <>
+            <table className="w-full table-fixed rounded-2xl">
+              <thead>
+                <tr className="text-textSecondary">
+                  <th className="px-4 py-2 text-left">Assignment</th>
+                  <th className="px-4 py-2 text-center">Score</th>
+                  <th className="px-4 py-2 text-right">Weight</th>
+                </tr>
+              </thead>
+              <tbody className="space-y-4">
+                {selectedSubject.assignments.map((assignment, index) => (
+                  <tr
+                    key={index}
+                    className={`overflow-hidden rounded-2xl shadow-sm`}
+                  >
+                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-l-2xl px-4 py-2`}>
+                      {assignment.name}
+                    </td>
+                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} px-4 py-2 text-center`}>{assignment.score}</td>
+                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-r-2xl px-4 py-2 text-right`}>{assignment.weight} &#160; &#160; &#160; 
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="mt-4 flex gap-1">
+              <Text font={"semiBold"}>Weighted Average Score: </Text>
+              <Text color={"gray"}>{selectedSubject.score}</Text>
+            </div>
+            <table className="mt-4 w-full table-fixed rounded-2xl">
+              <thead>
+                <tr className="text-textSecondary">
+                  <th className="px-4 py-2 text-left">
+                    Historical Performance
                   </th>
                 </tr>
               </thead>
-              <tbody className="rounded-lg">
-                <tr className="bg-bgSecondary font-semibold hover:bg-primary hover:text-white">
-                  <th
-                    scope="row"
-                    className="text-textSecondary whitespace-nowrap rounded-s-2xl px-6 py-4 font-medium"
+              <tbody className="space-y-4">
+                {selectedSubject.historicalAssignments.map((history, index) => (
+                  <tr
+                    key={index}
+                    className={`overflow-hidden rounded-2xl shadow-sm`}
                   >
-                    Class 5/2
-                  </th>
-                  <td className="whitespace-nowrap px-6 py-4">English</td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    10:30 am-11:30 am
-                  </td>
-                  <td className="whitespace-nowrap rounded-e-2xl px-6 py-4">
-                    60 min
-                  </td>
-                </tr>
+                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-l-2xl px-4 py-2`}>{history.name}</td>
+                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-r-2xl px-4 py-2 text-right`}>{history.score} &#160; &#160; &#160; </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-          </div>
-        </div>
+            <div className="mt-4">
+              <Text font={"semiBold"}>Teacher Comments</Text>
+              <Box border="borderSecondary" className="mt-4">
+                {selectedSubject.teacherComments.map((comment, index) => (
+                  <div key={index} className="space-y-4">
+                    <div>
+                      <div className="flex gap-4">
+                        <div>
+                          <Image
+                            src={comment?.imgUrl || "/images/userr.png"}
+                            alt="Teacher Photo"
+                            width={35}
+                            height={35}
+                            className="rounded-full"
+                          />
+                        </div>
+                        <Text font={"semiBold"} size={"lg"}>
+                          {comment?.name}
+                        </Text>
+                      </div>
+                      <Text className="mt-4" size={"lg"}>
+                        {comment?.comment}
+                      </Text>
+                    </div>
+                  </div>
+                ))}
+              </Box>
+            </div>
+          </>
+        )}
       </div>
-      <div className="flex w-full gap-10 max-[1080px]:grid">
-        <div className="flex h-fit w-[450px] rounded-md bg-white p-4 max-[1080px]:w-full max-[800px]:overflow-auto">
-          <div className="relative w-full overflow-auto">
-            <p className="mb-3 font-semibold">Attendance</p>
-            <table className="w-full table-auto overflow-x-auto p-4 text-left text-sm text-black">
-              <thead className="bg-thead text-textPrimary text-xs uppercase">
-                <tr>
-                  <th scope="col" className="whitespace-nowrap px-6 py-3">
-                    Daily Attendance
-                  </th>
-                  <th
-                    scope="col"
-                    className="justify-end whitespace-nowrap px-6 py-3 text-end"
-                  >
-                    Absent
-                  </th>
-                  <th
-                    scope="col"
-                    className="justify-end whitespace-nowrap px-6 py-3 text-end"
-                  >
-                    Present
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="">
-                <tr className="font-semibold">
-                  <th
-                    scope="row"
-                    className="text-textSecondary grid gap-2 whitespace-nowrap px-6 py-4 font-medium"
-                  >
-                    Omar Ali
-                    <p className="text-gray-400">04:00 PM-045 PM</p>
-                  </th>
-                  <td className="justify-end whitespace-nowrap px-6 py-4 text-end">
-                    <button className="rounded-full bg-white p-3 shadow-lg">
-                      {" "}
-                      <img src="/images/remove.png" alt="#" />
-                    </button>
-                  </td>
-                  <td className="justify-end whitespace-nowrap px-6 py-4 text-end">
-                    <button className="rounded-full bg-white p-3 shadow-lg">
-                      {" "}
-                      <img src="/images/check.png" alt="#" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div className="grid w-full gap-4">
-          <div className="grid w-full gap-2 rounded-md bg-white p-4">
-            <div className="flex w-full items-start justify-between">
-              <p className="mb-3 font-semibold">Attendance</p>
-              <button className="flex items-center gap-2 font-medium text-primary">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>{" "}
-                Add Material
-              </button>
-            </div>
-            <div className="rounded-md border border-gray-200 p-4">
-              <div className="grid h-full gap-2 border-l-2 border-primary px-3">
-                <div className="flex items-start justify-between">
-                  <p className="mb-3 font-semibold">Title</p>
-                  <button>
-                    <svg
-                      className="h-6 w-6 text-black"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      {" "}
-                      <circle cx="12" cy="12" r="1" />{" "}
-                      <circle cx="12" cy="5" r="1" />{" "}
-                      <circle cx="12" cy="19" r="1" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="text-gray-400">
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Eveniet, dolorum velit beatae sed aspernatur non! Tempore
-                    earum, voluptas optio odit obcaecati repellat libero
-                    voluptatum aut, similique culpa et minima accusamus.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-md border border-gray-200 p-4">
-              <div className="grid h-full gap-2 border-l-2 border-primary px-3">
-                <div className="flex items-start justify-between">
-                  <p className="mb-3 font-semibold">Title</p>
-                  <button>
-                    <svg
-                      className="h-6 w-6 text-black"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      {" "}
-                      <circle cx="12" cy="12" r="1" />{" "}
-                      <circle cx="12" cy="5" r="1" />{" "}
-                      <circle cx="12" cy="19" r="1" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="text-gray-400">
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Eveniet, dolorum velit beatae sed aspernatur non! Tempore
-                    earum, voluptas optio odit obcaecati repellat libero
-                    voluptatum aut, similique culpa et minima accusamus.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="grid w-full gap-2 rounded-md bg-white p-4">
-            <div className="flex w-full items-start justify-between">
-              <p className="mb-3 font-semibold">Attendance</p>
-              <button className="flex items-center gap-2 font-medium text-primary">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>{" "}
-                Add Material
-              </button>
-            </div>
-            <div className="rounded-md border border-gray-200 p-4">
-              <div className="grid h-full gap-2 border-l-2 border-primary px-3">
-                <div className="flex items-start justify-between">
-                  <p className="mb-3 font-semibold">Title</p>
-                  <button>
-                    <svg
-                      className="h-6 w-6 text-black"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      {" "}
-                      <circle cx="12" cy="12" r="1" />{" "}
-                      <circle cx="12" cy="5" r="1" />{" "}
-                      <circle cx="12" cy="19" r="1" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="text-gray-400">
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Eveniet, dolorum velit beatae sed aspernatur non! Tempore
-                    earum, voluptas optio odit obcaecati repellat libero
-                    voluptatum aut, similique culpa et minima accusamus.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    </div>
+  </Box>
+</div>
+
     </Container>
   );
 };
