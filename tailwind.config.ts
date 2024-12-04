@@ -25,6 +25,7 @@ export default {
         error: "rgba(var(--error))",
         softRed: "rgba(var(--soft-red))",
         success: "rgba(var(--success))",
+        rightAnswer: "rgba(var(--right-answer))",
         limeGreen: "rgba(var(--limeGreen))",
         info: "rgba(var(--info))",
         warning: "rgba(var(--warning))",

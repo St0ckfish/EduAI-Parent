@@ -11,6 +11,7 @@ import { useState } from "react";
 import Image from "next/image";
 import BoxGrid from "~/_components/BoxGrid";
 import { RiArrowRightSLine } from "react-icons/ri";
+import Link from "next/link";
 
 const FollowUp = () => {
   const { control } = useForm({
@@ -140,7 +141,6 @@ const FollowUp = () => {
 
   return (
     <Container>
-
       <div className="mb-8 flex justify-between">
         <div>
           <Controller
@@ -216,7 +216,7 @@ const FollowUp = () => {
             </div>
             <div className="flex gap-1">
               <Text color={"primary"} font={"semiBold"}>
-                Show details
+                <Link href={"/dailyplan"}>Show details</Link>
               </Text>
               <RiArrowRightSLine className="text-primary" size={25} />
             </div>
@@ -287,127 +287,144 @@ const FollowUp = () => {
             </Box>
           </BoxGrid>
         </Box>
-      </BoxGrid> 
+      </BoxGrid>
 
       <div className="mt-6">
-
-  <Box>
-    <Text font={"bold"} size={"xl"}>
-      Grade Book
-    </Text>
-    <div className="flex w-full justify-start gap-8 rounded-xl bg-bgPrimary p-8">
-      <div className="w-1/5">
-        <RadioGroup.Root
-          className="gap-4"
-          value={selectedGrade}
-          onValueChange={handleGradeChange}
-          aria-label="Grade Selection"
-        >
-          {subjects.map(({ value, label }) => (
-            <RadioGroup.Item
-              key={value}
-              value={value}
-              className="bg-lightGray group mt-1 flex h-20 w-full flex-col justify-center rounded-l-2xl px-4 text-center text-textPrimary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-              aria-labelledby={`${value}-label`}
-            >
-              <span
-                id={`${value}-label`}
-                className="text-xl font-semibold group-data-[state=checked]:text-white"
+        <Box>
+          <Text font={"bold"} size={"xl"}>
+            Grade Book
+          </Text>
+          <div className="flex w-full justify-start gap-8 rounded-xl bg-bgPrimary p-8">
+            <div className="w-1/5">
+              <RadioGroup.Root
+                className="gap-4"
+                value={selectedGrade}
+                onValueChange={handleGradeChange}
+                aria-label="Grade Selection"
               >
-                {label}
-              </span>
-            </RadioGroup.Item>
-          ))}
-        </RadioGroup.Root>
-      </div>
-
-      <div className="w-4/5">
-        {/* Display the selected subject's assignments */}
-        {selectedSubject && (
-          <>
-            <table className="w-full table-fixed rounded-2xl">
-              <thead>
-                <tr className="text-textSecondary">
-                  <th className="px-4 py-2 text-left">Assignment</th>
-                  <th className="px-4 py-2 text-center">Score</th>
-                  <th className="px-4 py-2 text-right">Weight</th>
-                </tr>
-              </thead>
-              <tbody className="space-y-4">
-                {selectedSubject.assignments.map((assignment, index) => (
-                  <tr
-                    key={index}
-                    className={`overflow-hidden rounded-2xl shadow-sm`}
+                {subjects.map(({ value, label }) => (
+                  <RadioGroup.Item
+                    key={value}
+                    value={value}
+                    className="group mt-1 flex h-20 w-full flex-col justify-center rounded-l-2xl bg-lightGray px-4 text-center text-textPrimary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                    aria-labelledby={`${value}-label`}
                   >
-                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-l-2xl px-4 py-2`}>
-                      {assignment.name}
-                    </td>
-                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} px-4 py-2 text-center`}>{assignment.score}</td>
-                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-r-2xl px-4 py-2 text-right`}>{assignment.weight} &#160; &#160; &#160; 
-                    </td>
-                  </tr>
+                    <span
+                      id={`${value}-label`}
+                      className="text-xl font-semibold group-data-[state=checked]:text-white"
+                    >
+                      {label}
+                    </span>
+                  </RadioGroup.Item>
                 ))}
-              </tbody>
-            </table>
-            <div className="mt-4 flex gap-1">
-              <Text font={"semiBold"}>Weighted Average Score: </Text>
-              <Text color={"gray"}>{selectedSubject.score}</Text>
+              </RadioGroup.Root>
             </div>
-            <table className="mt-4 w-full table-fixed rounded-2xl">
-              <thead>
-                <tr className="text-textSecondary">
-                  <th className="px-4 py-2 text-left">
-                    Historical Performance
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="space-y-4">
-                {selectedSubject.historicalAssignments.map((history, index) => (
-                  <tr
-                    key={index}
-                    className={`overflow-hidden rounded-2xl shadow-sm`}
-                  >
-                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-l-2xl px-4 py-2`}>{history.name}</td>
-                    <td className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-r-2xl px-4 py-2 text-right`}>{history.score} &#160; &#160; &#160; </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="mt-4">
-              <Text font={"semiBold"}>Teacher Comments</Text>
-              <Box border="borderSecondary" className="mt-4">
-                {selectedSubject.teacherComments.map((comment, index) => (
-                  <div key={index} className="space-y-4">
-                    <div>
-                      <div className="flex gap-4">
-                        <div>
-                          <Image
-                            src={comment?.imgUrl || "/images/userr.png"}
-                            alt="Teacher Photo"
-                            width={35}
-                            height={35}
-                            className="rounded-full"
-                          />
-                        </div>
-                        <Text font={"semiBold"} size={"lg"}>
-                          {comment?.name}
-                        </Text>
-                      </div>
-                      <Text className="mt-4" size={"lg"}>
-                        {comment?.comment}
-                      </Text>
-                    </div>
+
+            <div className="w-4/5">
+              {/* Display the selected subject's assignments */}
+              {selectedSubject && (
+                <>
+                  <table className="w-full table-fixed rounded-2xl">
+                    <thead>
+                      <tr className="text-textSecondary">
+                        <th className="px-4 py-2 text-left">Assignment</th>
+                        <th className="px-4 py-2 text-center">Score</th>
+                        <th className="px-4 py-2 text-right">Weight</th>
+                      </tr>
+                    </thead>
+                    <tbody className="space-y-4">
+                      {selectedSubject.assignments.map((assignment, index) => (
+                        <tr
+                          key={index}
+                          className={`overflow-hidden rounded-2xl shadow-sm`}
+                        >
+                          <td
+                            className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-l-2xl px-4 py-2`}
+                          >
+                            {assignment.name}
+                          </td>
+                          <td
+                            className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} px-4 py-2 text-center`}
+                          >
+                            {assignment.score}
+                          </td>
+                          <td
+                            className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-r-2xl px-4 py-2 text-right`}
+                          >
+                            {assignment.weight} &#160; &#160; &#160;
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="mt-4 flex gap-1">
+                    <Text font={"semiBold"}>Weighted Average Score: </Text>
+                    <Text color={"gray"}>{selectedSubject.score}</Text>
                   </div>
-                ))}
-              </Box>
+                  <table className="mt-4 w-full table-fixed rounded-2xl">
+                    <thead>
+                      <tr className="text-textSecondary">
+                        <th className="px-4 py-2 text-left">
+                          Historical Performance
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="space-y-4">
+                      {selectedSubject.historicalAssignments.map(
+                        (history, index) => (
+                          <tr
+                            key={index}
+                            className={`overflow-hidden rounded-2xl shadow-sm`}
+                          >
+                            <td
+                              className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-l-2xl px-4 py-2`}
+                            >
+                              {history.name}
+                            </td>
+                            <td
+                              className={`${index % 2 === 0 ? "bg-bgSecondary" : "bg-bgSecondary/50"} rounded-r-2xl px-4 py-2 text-right`}
+                            >
+                              {history.score} &#160; &#160; &#160;{" "}
+                            </td>
+                          </tr>
+                        ),
+                      )}
+                    </tbody>
+                  </table>
+                  <div className="mt-4">
+                    <Text font={"semiBold"}>Teacher Comments</Text>
+                    <Box border="borderSecondary" className="mt-4">
+                      {selectedSubject.teacherComments.map((comment, index) => (
+                        <div key={index} className="space-y-4">
+                          <div>
+                            <div className="flex gap-4">
+                              <div>
+                                <Image
+                                  src={comment?.imgUrl || "/images/userr.png"}
+                                  alt="Teacher Photo"
+                                  width={35}
+                                  height={35}
+                                  className="rounded-full"
+                                />
+                              </div>
+                              <Text font={"semiBold"} size={"lg"}>
+                                {comment?.name}
+                              </Text>
+                            </div>
+                            <Text className="mt-4" size={"lg"}>
+                              {comment?.comment}
+                            </Text>
+                          </div>
+                        </div>
+                      ))}
+                    </Box>
+                  </div>
+                </>
+              )}
             </div>
-          </>
-        )}
+          </div>
+        </Box>
       </div>
-    </div>
-  </Box>
-</div>
-
     </Container>
   );
 };

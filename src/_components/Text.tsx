@@ -1,6 +1,7 @@
 "use client";
 
-import { VariantProps, cva } from "class-variance-authority";
+import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import { forwardRef } from "react";
 import { cn } from "~/lib/utils";
 
@@ -27,13 +28,14 @@ const textVariants = cva("text-textPrimary", {
       "4xl": "text-4xl",
     },
     color: {
+      white: "#ffffff",
       default: "text-textPrimary",
       primary: "text-primary",
       gray: "text-textSecondary",
       muted: "text-textMuted",
       warning: "text-warning",
-      success: "text-success",
       error: "text-error",
+      success: "text-success",
     },
   },
   defaultVariants: {
@@ -59,7 +61,7 @@ const Text = forwardRef<HTMLParagraphElement, TextProps>(
         className={cn(textVariants({ font, color, size }), className)}
         {...props}
       >
-        {children}  {/* Render children here */}
+        {children}
       </p>
     );
   }
