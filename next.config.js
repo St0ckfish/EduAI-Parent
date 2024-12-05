@@ -14,13 +14,13 @@ const config = {
    * @see https://github.com/vercel/next.js/issues/41980
    */
   i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+    defaultLocale: 'en',
+    locales: ['en', 'ar'],
   },
   transpilePackages: ["geist"],
-  
+
   images: {
-    domains: ["eduai.vitaparapharma.com"], // Add your allowed domains here
+    domains: ['eduai.vitaparapharma.com'],
   },
 };
 

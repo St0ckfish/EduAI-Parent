@@ -150,7 +150,6 @@ const FollowUp = () => {
             defaultValue="" // Initialize with a default value
             render={({ field: { onChange, value } }) => (
               <SearchableSelect
-                // error={errors.schoolId?.message?.toString() ?? ""}
                 value={value}
                 onChange={onChange}
                 placeholder="Select School"

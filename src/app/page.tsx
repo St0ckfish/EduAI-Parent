@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Container from "~/_components/Container";
 import {
   FaEllipsisH,
@@ -25,8 +24,13 @@ import {
 import { isToday, isAfter } from "date-fns";
 import { CustomEvent } from "~/types";
 import { toast } from "react-toastify";
-import { useUpcomingEvents, useAddAttendance } from "~/APIs/hooks/useEvents";
+import {
+  useUpcomingEvents,
+  useAddAttendance,
+  useRemoveAttendance,
+} from "~/APIs/hooks/useEvents";
 import { useGetAllPosts, useLikePost } from "~/APIs/hooks/usePost";
+import Image from "next/image";
 
 export default function Home() {
   const {
@@ -34,6 +38,7 @@ export default function Home() {
     isLoading: isEventsLoading,
     refetch: refetchEvents,
   } = useUpcomingEvents();
+  console.log("dataEvents", dataEvents);
 
   const { mutate: addAttendance } = useAddAttendance({
     onSuccess: () => {
@@ -44,6 +49,17 @@ export default function Home() {
       toast.success("Error confirmed attendance!");
     },
   });
+
+  const { mutate: removeAttendance } = useRemoveAttendance({
+    onSuccess: () => {
+      toast.success("Attendance removed successfully!");
+      refetchEvents();
+    },
+    onError: () => {
+      toast.success("Error remove attendance!");
+    },
+  });
+
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   console.log(comment);
@@ -95,6 +111,7 @@ export default function Home() {
     refetch,
     isLoading,
   } = useGetAllPosts({ page: 0, size: 10 });
+  // console.log('dataPosts', dataPosts);
   const { mutate: likePost } = useLikePost();
 
   const handleLikeClick = (postId: number, liked: boolean) => {
@@ -136,9 +153,17 @@ export default function Home() {
     refetchEvents();
   };
 
-  if (isLoading || isEventsLoading) return <div className="flex items-center justify-center h-[750px]">
-    <Spinner />
-  </div>;
+  const handleRemoveAttendance = (eventId: string) => {
+    removeAttendance(eventId);
+    refetchEvents();
+  };
+
+  if (isLoading || isEventsLoading)
+    return (
+      <div className="flex h-[750px] items-center justify-center">
+        <Spinner />
+      </div>
+    );
 
   return (
     <Container>
@@ -151,6 +176,8 @@ export default function Home() {
                   <div className="flex gap-4">
                     <div className="h-[60px] w-[60px] overflow-hidden">
                       <Image
+                        priority
+                        unoptimized
                         src={
                           post.isPublisherPictureExists
                             ? post.publisherPicture
@@ -176,10 +203,21 @@ export default function Home() {
                 <Text className="m-2">{post.content}</Text>
                 <div className="mt-4">
                   {post?.attachments?.length > 0 && (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    <div
+                      className={`grid gap-4 ${
+                        post?.attachments?.length === 1
+                          ? "grid-cols-1"
+                          : post?.attachments?.length === 2
+                            ? "grid-cols-2"
+                            : "grid-cols-2 md:grid-cols-3"
+                      }`}
+                    >
+                      {" "}
                       {post.attachments.slice(0, 6).map((attachment, index) => (
                         <div key={index} className="relative">
                           <Image
+                            priority
+                            unoptimized
                             src={attachment.viewLink}
                             alt={`Post Image ${index + 1}`}
                             width={500}
@@ -332,7 +370,12 @@ export default function Home() {
                         </div>
                         <div>
                           {event.isAttendee ? (
-                            <Button color="secondary">
+                            <Button
+                              onClick={() =>
+                                handleRemoveAttendance(event.id.toString())
+                              }
+                              color="secondary"
+                            >
                               Attendance Confirmed
                             </Button>
                           ) : (
@@ -355,7 +398,7 @@ export default function Home() {
             )}
           </div>
 
-          <div className="my-2 border-b border-borderPrimary">
+          <div className="my-2">
             <Text font="bold" size="2xl">
               Upcoming Events
             </Text>
@@ -394,7 +437,14 @@ export default function Home() {
                     </div>
                     <div>
                       {event.isAttendee ? (
-                        <Button color="secondary">Attendance Confirmed</Button>
+                        <Button
+                          onClick={() =>
+                            handleRemoveAttendance(event.id.toString())
+                          }
+                          color="secondary"
+                        >
+                          Attendance Confirmed
+                        </Button>
                       ) : (
                         <Button
                           onClick={() =>
