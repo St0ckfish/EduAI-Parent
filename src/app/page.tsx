@@ -136,7 +136,9 @@ export default function Home() {
     refetchEvents();
   };
 
-  if (isLoading || isEventsLoading) return <Spinner />;
+  if (isLoading || isEventsLoading) return <div className="flex items-center justify-center h-[750px]">
+    <Spinner />
+  </div>;
 
   return (
     <Container>
@@ -234,7 +236,8 @@ export default function Home() {
                   <div className="my-4 ml-4">
                     {isLoadingComments ? (
                       <div className="flex justify-center py-4">
-                        <Spinner />
+                        {/* <Spinner /> */}
+                        loading
                       </div>
                     ) : (
                       <>

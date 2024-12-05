@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import Image from "next/image";
 import Link from "next/link";
-import Button from "~/_components/Button";
-import SearchableSelect from "~/_components/SearchSelect";
-import Spinner from "~/_components/Spinner";
+import Image from "next/image";
+import { toast } from "react-toastify";
+import React,{ type ChangeEvent, useState } from "react";
 import Input from "~/_components/Input";
-import MultiSelectComponent from "~/_components/MultiSelect";
+import Button from "~/_components/Button";
+import { Text } from "~/_components/Text";
+import Spinner from "~/_components/Spinner";
+import type { SignUpFormData } from "~/types";
+import { useForm, Controller } from "react-hook-form";
+import SearchableSelect from "~/_components/SearchSelect";
 import {
   useGetAllRegions,
   useGetAllSchools,
@@ -23,8 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { toast } from "react-toastify";
-import { Text } from "~/_components/Text";
 
 const Signup = () => {
   const [step, setStep] = useState(1);
@@ -34,7 +34,7 @@ const Signup = () => {
     register,
     trigger,
     formState: { errors },
-  } = useForm({
+  } = useForm<SignUpFormData>({
     shouldUnregister: false,
   });
 
@@ -115,39 +115,99 @@ const Signup = () => {
     : [];
 
   const { mutate, isPending: isSubmitting } = useSignUp();
+  const onSubmit = (data: SignUpFormData) => {
+    const formData = new FormData();
 
-  const onSubmit = (data: any) => {
-    mutate(data, {
+    const depositRequest = {
+      about: data.request.about,
+      birthDate: data.request.birthDate,
+      countryCode: data.request.countryCode,
+      email: data.request.email,
+      gender: data.request.gender,
+      name_ar: data.request.name_ar,
+      name_fr: data.request.name_fr,
+      name_en: data.request.name_en,
+      nationality: data.request.nationality,
+      nid: data.request.nid,
+      number: data.request.number,
+      occupation_ar: data.request.occupation_ar,
+      occupation_fr: data.request.occupation_fr,
+      occupation_en: data.request.occupation_en,
+      password: data.request.password,
+      qualification: data.request.qualification,
+      regionId: data.request.regionId,
+      schoolId: data.request.schoolId,
+      subjects: data.request.subjects,
+      username: data.request.username,
+      student: {
+        username: data.request.student.username,
+        about: data.request.student.about,
+        birthDate: data.request.student.birthDate,
+        email: data.request.student.email,
+        gender: data.request.student.gender,
+        language: data.request.student.language,
+        name_ar: data.request.student.name_ar,
+        name_fr: data.request.student.name_fr,
+        name_en: data.request.student.name_en,
+        nid: data.request.student.nid,
+        password: data.request.student.password,
+        relationshipToStudent: "FATHER",
+        // TODO: Make it dynamic
+        eduSystemId: "1",
+        hasScholarship: "0",
+        department: "SCIENTIFIC",
+        studyLevel:  "GRADE11",
+        subDepartment: "MATHEMATICAL_SCIENCES",
+      }
+    };
+
+    formData.append('request', JSON.stringify(depositRequest));
+    if (data.parentIdPhoto && data.parentIdPhoto instanceof FileList && data.parentIdPhoto.length > 0) {
+      formData.append('parentIdPhoto', data.parentIdPhoto[0]!);
+    }
+    if (data.studentCertificatesOfAchievement && data.studentCertificatesOfAchievement instanceof FileList && data.studentCertificatesOfAchievement.length > 0) {
+      formData.append('studentCertificatesOfAchievement', data.studentCertificatesOfAchievement[0]!);
+    }
+    if (data.studentIdPhoto && data.studentIdPhoto instanceof FileList && data.studentIdPhoto.length > 0) {
+      formData.append('studentIdPhoto', data.studentIdPhoto[0]!);
+    }
+    if (data.studentProfilePhoto && data.studentProfilePhoto instanceof FileList && data.studentProfilePhoto.length > 0) {
+      formData.append('studentProfilePhoto', data.studentProfilePhoto[0]!);
+    }
+    mutate(formData as unknown as Partial<SignUpFormData>, {
       onSuccess: () => {
         toast.success("Form submitted successfully!");
-        // Optionally, redirect the user to another page
-        // router.push("/welcome");
       },
-      onError: (err: any) => {
-        toast.error(err.response.data.message);
-        setErrorMessage(err.response.data.data);
-        // Optionally, set a form-level error
+      onError: (err: Error & { response?: { data: { message: string; data: [] } } }) => {
+        if (err.response?.data) {
+          toast.error(err.response.data.message);
+          setErrorMessage(err.response.data.data);
+        } else {
+          toast.error(err.message);
+        }
       },
     });
   };
 
   // Function to trigger validation for the current step
   const triggerValidation = async () => {
-    let fieldsToValidate: string[] = [];
+    let fieldsToValidate: (keyof SignUpFormData['request'])[] = [];
     switch (step) {
       case 1:
         fieldsToValidate = ["username", "email", "schoolId", "regionId"];
         break;
       case 2:
-        fieldsToValidate = ["name_en", "name_fr", "name_ar", "subjects"];
+        fieldsToValidate = ["name_en", "name_fr", "name_ar"];
         break;
       case 3:
-        fieldsToValidate = ["qualification", "password"];
+        fieldsToValidate = ["occupation_en", "occupation_fr", "occupation_ar"];
         break;
       case 4:
+        fieldsToValidate = ["password", "nationality"];
+        break;
+      case 5:
         fieldsToValidate = [
-          "nationality",
-          "gender",
+          "gender", 
           "nid",
           "birthDate",
           "countryCode",
@@ -157,7 +217,10 @@ const Signup = () => {
       default:
         break;
     }
-    const result = await trigger(fieldsToValidate);
+    
+    const mappedFieldsToValidate = fieldsToValidate.map(field => `request.${field}` as const);
+    
+    const result = await trigger(mappedFieldsToValidate);
     return result;
   };
 
@@ -182,15 +245,15 @@ const Signup = () => {
           />
         </Link>
       </div>
-      <div className="flex w-full max-w-lg flex-col items-center p-4 md:p-8">
+      <div className="flex w-full max-w-2xl flex-col items-center p-4 md:p-8">
         <Text font={"bold"} size={"4xl"} className="mb-4">
           Sign Up
         </Text>
 
         {/* Steps */}
-        <div className="mb-20 flex w-full items-center justify-between">
+        <div className="mb-20 flex w-full items-center justify-center">
           <div className="flex items-center">
-            {[1, 2, 3, 4].map((stepIndex, index) => (
+            {[1, 2, 3, 4, 5, 6, 7].map((stepIndex, index) => (
               <React.Fragment key={stepIndex}>
                 <div
                   className={`relative flex h-8 w-8 items-center justify-center rounded-full ${
@@ -202,7 +265,7 @@ const Signup = () => {
                     {stepsDescription[index]}
                   </Text>
                 </div>
-                {index < 3 && (
+                {index < 6 && (
                   <hr
                     className={`h-[5px] w-20 ${
                       index < step - 1 ? "bg-primary" : "bg-gray-300"
@@ -220,27 +283,27 @@ const Signup = () => {
             <>
               <label htmlFor="username" className="">
                 <Input
-                  {...register("username", {
+                  {...register("request.username", {
                     required: "Username is required",
                     minLength: {
                       value: 3,
                       message: "Username must be at least 3 characters",
                     },
                   })}
-                  error={errors.username?.message?.toString() ?? ""}
+                  error={errors.request?.username?.message?.toString() ?? ""}
                   placeholder="Username"
                   theme="transparent"
                 />
-                {errors.username && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.username.message?.toString()}
+                {errors.request?.username && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.username.message?.toString()}
                   </p>
                 )}
               </label>
               <label htmlFor="email" className="block">
                 <Input
-                  error={errors.email?.message?.toString() ?? ""}
-                  {...register("email", {
+                  error={errors.request?.email?.message?.toString() ?? ""}
+                  {...register("request.email", {
                     required: "Email is required",
                     pattern: {
                       value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
@@ -250,22 +313,22 @@ const Signup = () => {
                   placeholder="E-mail"
                   theme="transparent"
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.email.message?.toString()}
+                {errors.request?.email && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.email.message?.toString()}
                   </p>
                 )}
               </label>
 
               <label htmlFor="school" className="block">
                 <Controller
-                  name="schoolId"
+                  name="request.schoolId"
                   control={control}
                   rules={{ required: "School selection is required" }}
                   defaultValue="" // Initialize with a default value
                   render={({ field: { onChange, value } }) => (
                     <SearchableSelect
-                      error={errors.schoolId?.message?.toString() ?? ""}
+                      error={errors.request?.schoolId?.message?.toString() ?? ""}
                       value={value}
                       onChange={onChange}
                       placeholder="Select School"
@@ -276,13 +339,13 @@ const Signup = () => {
               </label>
               <label htmlFor="regionId" className="block">
                 <Controller
-                  name="regionId"
+                  name="request.regionId"
                   control={control}
                   rules={{ required: "Region selection is required" }}
                   defaultValue="" // Initialize with a default value
                   render={({ field: { onChange, value } }) => (
                     <SearchableSelect
-                      error={errors.regionId?.message?.toString() ?? ""}
+                      error={errors.request?.regionId?.message?.toString() ?? ""}
                       value={value}
                       onChange={onChange}
                       placeholder="Select Region"
@@ -306,88 +369,50 @@ const Signup = () => {
             <>
               <label htmlFor="name_en" className="block">
                 <Input
-                  error={errors.name_en?.message?.toString() ?? ""}
-                  {...register("name_en", {
+                  error={errors.request?.name_en?.message?.toString() ?? ""}
+                  {...register("request.name_en", {
                     required: "English name is required",
                   })}
                   placeholder="Full Name (English)"
                   theme="transparent"
                 />
-                {errors.name_en && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.name_en.message?.toString()}
+                {errors.request?.name_en && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.name_en.message?.toString()}
                   </p>
                 )}
               </label>
               <label htmlFor="name_fr" className="block">
                 <Input
-                  error={errors.name_fr?.message?.toString() ?? ""}
-                  {...register("name_fr", {
+                  error={errors.request?.name_fr?.message?.toString() ?? ""}
+                  {...register("request.name_fr", {
                     required: "French name is required",
                   })}
                   placeholder="Full Name (French)"
                   theme="transparent"
                 />
-                {errors.name_fr && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.name_fr.message?.toString()}
+                {errors.request?.name_fr && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request.name_fr.message?.toString()}
                   </p>
                 )}
               </label>
               <label htmlFor="name_ar" className="block">
                 <Input
-                  error={errors.name_ar?.message?.toString() ?? ""}
-                  {...register("name_ar", {
+                  error={errors.request?.name_ar?.message?.toString() ?? ""}
+                  {...register("request.name_ar", {
                     required: "Arabic name is required",
                   })}
                   placeholder="Full Name (Arabic)"
                   theme="transparent"
                 />
-                {errors.name_ar && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.name_ar.message?.toString()}
+                {errors.request?.name_ar && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.name_ar.message?.toString()}
                   </p>
                 )}
               </label>
 
-              <label htmlFor="subjects" className="block">
-                <Controller
-                  name="subjects"
-                  control={control}
-                  rules={{ required: "At least one interest is required" }}
-                  render={({ field: { onChange, value } }) => (
-                    <MultiSelectComponent
-                      value={value}
-                      onChange={onChange}
-                      options={[
-                        { value: "ARABIC", label: "Arabic" },
-                        { value: "MUSIC", label: "Music" },
-                        { value: "ART", label: "Art" },
-                        {
-                          value: "FOREIGN_LANGUAGE",
-                          label: "Foreign Language",
-                        },
-                        { value: "ENGLISH", label: "English" },
-                        { value: "SOCIAL_STUDIES", label: "Social Studies" },
-                        { value: "FRENCH", label: "French" },
-                        { value: "MATHEMATICS", label: "Mathematics" },
-                        {
-                          value: "COMPUTER_SCIENCE",
-                          label: "Computer Science",
-                        },
-                        { value: "CHEMISTRY", label: "Chemistry" },
-                        { value: "ECONOMICS", label: "Economics" },
-                        { value: "SCIENCE", label: "Science" },
-                        { value: "PHYSICS", label: "Physics" },
-                        { value: "GEOGRAPHY", label: "Geography" },
-                        { value: "HISTORY", label: "History" },
-                      ]}
-                      placeholder="Select Interests"
-                      error={errors.subjects?.message?.toString()}
-                    />
-                  )}
-                />
-              </label>
               <div className="flex space-x-4">
                 <Button type="button" onClick={prevStep} theme="outline">
                   Prev
@@ -404,47 +429,73 @@ const Signup = () => {
           )}
           {step === 3 && (
             <>
-              <label htmlFor="qualification" className="block">
-                <Controller
-                  name="qualification"
-                  control={control}
-                  rules={{ required: "Qualification is required" }}
-                  defaultValue=""
-                  render={({ field: { onChange, value } }) => (
-                    <Select onValueChange={onChange} value={value}>
-                      <SelectTrigger
-                        className={`w-full border ${errors.qualification ? "border-error" : ""}`}
-                      >
-                        <SelectValue placeholder="Select Qualification" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="HIGH_SCHOOL_DIPLOMA">
-                          High School Diploma
-                        </SelectItem>
-                        <SelectItem value="MASTER_DEGREE">
-                          Master Degree
-                        </SelectItem>
-                        <SelectItem value="BACHELOR_DEGREE">
-                          Bachelor Degree
-                        </SelectItem>
-                        <SelectItem value="DOCTORATE_DEGREE">
-                          Doctorate Degree
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
+              <label htmlFor="occupation_en" className="block">
+                <Input
+                  error={errors.request?.occupation_en?.message?.toString() ?? ""}
+                  {...register("request.occupation_en", {
+                    required: "English Occupation is required",
+                  })}
+                  placeholder="Occupation (English)"
+                  theme="transparent"
                 />
-                {errors.qualification && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.qualification.message?.toString()}
+                {errors.request?.occupation_en && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.occupation_en.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="occupation_fr" className="block">
+                <Input
+                  error={errors.request?.occupation_fr?.message?.toString() ?? ""}
+                  {...register("request.occupation_fr", {
+                    required: "French Occupation is required",
+                  })}
+                  placeholder="Occupation (French)"
+                  theme="transparent"
+                />
+                {errors.request?.occupation_fr && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.occupation_fr.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="occupation_ar" className="block">
+                <Input
+                  error={errors.request?.occupation_ar?.message?.toString() ?? ""}
+                  {...register("request.occupation_ar", {
+                    required: "Arabic Occupation is required",
+                  })}
+                  placeholder="Occupation (Arabic)"
+                  theme="transparent"
+                />
+                {errors.request?.occupation_ar && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.occupation_ar.message?.toString()}
                   </p>
                 )}
               </label>
 
+              <div className="flex space-x-4">
+                <Button type="button" onClick={prevStep} theme="outline">
+                  Prev
+                </Button>
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={isSubmitting}
+                >
+                  Next
+                </Button>
+              </div>
+            </>
+          )}
+          {step === 4 && (
+            <>
+
               <label htmlFor="password" className="block">
                 <Input
-                  error={errors.password?.message?.toString() ?? ""}
-                  {...register("password", {
+                  error={errors.request?.password?.message?.toString() ?? ""}
+                  {...register("request.password", {
                     required: "Password is required",
                     minLength: {
                       value: 6,
@@ -455,18 +506,35 @@ const Signup = () => {
                   type="password"
                   theme="transparent"
                 />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.password.message?.toString()}
+                {errors.request?.password && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.password.message?.toString()}
                   </p>
                 )}
               </label>
+              <label htmlFor="nationality" className="block">
+                <Controller
+                  name="request.nationality"
+                  control={control}
+                  rules={{ required: "Nationality is required" }}
+                  defaultValue="" // Initialize with a default value
+                  render={({ field: { onChange, value } }) => (
+                    <SearchableSelect
+                      error={errors.request?.nationality?.message?.toString() ?? ""}
+                      value={value}
+                      onChange={onChange}
+                      placeholder="Select Nationality"
+                      options={optionsNationalities}
+                    />
+                  )}
+                />
+              </label>
               <label htmlFor="about" className="block">
                 <textarea
-                  {...register("about")}
+                  {...register("request.about")}
                   id="about"
                   placeholder="Write a brief summary about yourself. (Optional)"
-                  className="w-full rounded-lg border border-borderPrimary bg-bgSecondary p-3 text-textPrimary outline-none transition duration-200 ease-in"
+                  className="w-full rounded-lg border border-borderPrimary bg-bgSecondary p-3 text-gray-700 outline-none transition duration-200 ease-in"
                 ></textarea>
               </label>
 
@@ -485,38 +553,21 @@ const Signup = () => {
               </div>
             </>
           )}
-          {step === 4 && (
+          {step === 5 && (
             <>
-              <label htmlFor="nationality" className="block">
-                <Controller
-                  name="nationality"
-                  control={control}
-                  rules={{ required: "Nationality is required" }}
-                  defaultValue="" // Initialize with a default value
-                  render={({ field: { onChange, value } }) => (
-                    <SearchableSelect
-                      error={errors.nationality?.message?.toString() ?? ""}
-                      value={value}
-                      onChange={onChange}
-                      placeholder="Select Nationality"
-                      options={optionsNationalities}
-                    />
-                  )}
-                />
-              </label>
-
+              
               <label htmlFor="gender" className="block">
                 <Controller
-                  name="gender"
+                  name="request.gender"
                   control={control}
                   rules={{ required: "Gender is required" }}
                   defaultValue="" // Initialize with a default value
                   render={({ field: { onChange, value } }) => (
                     <Select onValueChange={onChange} value={value}>
                       <SelectTrigger
-                        className={`w-full border border-borderPrimary ${errors.gender ? "border-error" : ""}`}
+                        className={`w-full border ${errors.request?.gender ? "border-error" : ""}`}
                       >
-                        <SelectValue placeholder="Select Gender" className="hover:bg-bgSecondary" />
+                        <SelectValue placeholder="Select Gender" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="MALE">Male</SelectItem>
@@ -525,37 +576,37 @@ const Signup = () => {
                     </Select>
                   )}
                 />
-                {errors.gender && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.gender.message?.toString()}
+                {errors.request?.gender && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.gender.message?.toString()}
                   </p>
                 )}
               </label>
 
               <label htmlFor="nid" className="block">
                 <Input
-                  {...register("nid", {
+                  {...register("request.nid", {
                     required: "National ID is required",
                     pattern: {
                       value: /^[A-Za-z0-9]+$/,
                       message: "Invalid National ID format",
                     },
                   })}
-                  error={errors.nid?.message?.toString()}
+                  error={errors.request?.nid?.message?.toString()}
                   placeholder="National ID"
                   className="-mt-1"
                   theme="transparent"
                 />
-                {errors.nid && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.nid.message?.toString()}
+                {errors.request?.nid && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.nid.message?.toString()}
                   </p>
                 )}
               </label>
 
               <label htmlFor="birthDate" className="block">
                 <Input
-                  {...register("birthDate", {
+                  {...register("request.birthDate", {
                     required: "Date of birth is required",
                     validate: (value) => {
                       const today = new Date();
@@ -576,15 +627,15 @@ const Signup = () => {
                       return age >= 20 || "You must be at least 20 years old";
                     },
                   })}
-                  error={errors.birthDate?.message?.toString()}
+                  error={errors.request?.birthDate?.message?.toString()}
                   type="date"
                   placeholder="Date of birth"
                   className="!mb-2 !mt-2"
                   theme="transparent"
                 />
-                {errors.birthDate && (
-                  <p className="mt-1 text-sm text-error">
-                    {errors.birthDate.message?.toString()}
+                {errors.request?.birthDate && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.birthDate.message?.toString()}
                   </p>
                 )}
               </label>
@@ -592,13 +643,13 @@ const Signup = () => {
               <div className="mt-3 flex space-x-2">
                 <label htmlFor="country_code" className="block w-1/3">
                   <Controller
-                    name="countryCode"
+                    name="request.countryCode"
                     control={control}
                     rules={{ required: "Country code is required" }}
                     defaultValue="" // Initialize with a default value
                     render={({ field: { onChange, value } }) => (
                       <SearchableSelect
-                        error={errors.countryCode?.message?.toString() ?? ""}
+                        error={errors.request?.countryCode?.message?.toString() ?? ""}
                         value={value}
                         onChange={onChange}
                         placeholder="Country"
@@ -610,7 +661,7 @@ const Signup = () => {
 
                 <label htmlFor="number" className="block w-2/3 translate-y-1">
                   <Input
-                    {...register("number", {
+                    {...register("request.number", {
                       required: "Phone number is required",
                       pattern: {
                         value: /^\+?[1-9]\d{1,14}$/,
@@ -618,14 +669,14 @@ const Signup = () => {
                       },
                     })}
                     type="tel"
-                    error={errors.number?.message?.toString()}
+                    error={errors.request?.number?.message?.toString()}
                     placeholder="Phone Number"
                     className="-mt-[4px]"
                     theme="transparent"
                   />
-                  {errors.number && (
-                    <p className="mt-1 text-sm text-error">
-                      {errors.number?.message?.toString()}
+                  {errors.request?.number && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.request?.number?.message?.toString()}
                     </p>
                   )}
                 </label>
@@ -636,13 +687,20 @@ const Signup = () => {
                 <Button type="button" onClick={prevStep} theme="outline">
                   Prev
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Sign Up..." : "Sign Up"}
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={isSubmitting}
+                >
+                  Next
                 </Button>
+                {/* <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Sign Up..." : "Sign Up"}
+                </Button> */}
               </div>
 
               {/* Display Submission Error */}
-              <p className="mt-4 text-center text-sm text-error">
+              <p className="mt-4 text-center text-sm text-red-500">
                 {Array.isArray(errorMessage) &&
                   errorMessage.map((err: string, index: number) => (
                     <div key={index}>
@@ -651,6 +709,292 @@ const Signup = () => {
                   ))}
               </p>
             </>
+          )}
+          {step === 6 && (
+            <>
+            <Text font="medium" className="mb-10">Student Data</Text>
+              <label htmlFor="username" className="">
+                <Input
+                  {...register("request.student.username", {
+                    required: "Username is required",
+                    minLength: {
+                      value: 3,
+                      message: "Username must be at least 3 characters",
+                    },
+                  })}
+                  error={errors.request?.student?.username?.message?.toString() ?? ""}
+                  placeholder="Username"
+                  theme="transparent"
+                />
+                {errors.request?.student?.username && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student?.username.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="email" className="block">
+                <Input
+                  error={errors.request?.student?.email?.message?.toString() ?? ""}
+                  {...register("request.student.email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                      message: "Invalid email address",
+                    },
+                  })}
+                  placeholder="E-mail"
+                  theme="transparent"
+                />
+                {errors.request?.student?.email && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student?.email.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="name_en" className="block">
+                <Input
+                  error={errors.request?.student?.name_en?.message?.toString() ?? ""}
+                  {...register("request.student.name_en", {
+                    required: "English name is required",
+                  })}
+                  placeholder="Full Name (English)"
+                  theme="transparent"
+                />
+                {errors.request?.student?.name_en && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student.name_en.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="name_fr" className="block">
+                <Input
+                  error={errors.request?.student?.name_fr?.message?.toString() ?? ""}
+                  {...register("request.student.name_fr", {
+                    required: "French name is required",
+                  })}
+                  placeholder="Full Name (French)"
+                  theme="transparent"
+                />
+                {errors.request?.student?.name_fr && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request.student.name_fr.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="name_ar" className="block">
+                <Input
+                  error={errors.request?.student?.name_ar?.message?.toString() ?? ""}
+                  {...register("request.student.name_ar", {
+                    required: "Arabic name is required",
+                  })}
+                  placeholder="Full Name (Arabic)"
+                  theme="transparent"
+                />
+                {errors.request?.student?.name_ar && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student.name_ar.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="gender" className="block">
+                <Controller
+                  name="request.student.gender"
+                  control={control}
+                  rules={{ required: "Gender is required" }}
+                  defaultValue="" // Initialize with a default value
+                  render={({ field: { onChange, value } }) => (
+                    <Select onValueChange={onChange} value={value}>
+                      <SelectTrigger
+                        className={`w-full border ${errors.request?.student?.gender ? "border-error" : ""}`}
+                      >
+                        <SelectValue placeholder="Select Gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MALE">Male</SelectItem>
+                        <SelectItem value="FEMALE">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.request?.student?.gender && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student.gender.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="password" className="block">
+                <Input
+                  error={errors.request?.student?.password?.message?.toString() ?? ""}
+                  {...register("request.student.password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
+                  placeholder="Password"
+                  type="password"
+                  theme="transparent"
+                />
+                {errors.request?.student?.password && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student.password.message?.toString()}
+                  </p>
+                )}
+              </label>
+
+              <div className="mt-8 flex justify-center space-x-4">
+              <Button type="button" onClick={prevStep} theme="outline">
+                  Prev
+                </Button>
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={isSubmitting}
+                >
+                  Next
+                </Button>
+              </div>
+            </>
+          )}
+          {step === 7 && (
+            <>
+
+<label htmlFor="nid" className="block">
+                <Input
+                  {...register("request.student.nid", {
+                    required: "National ID is required",
+                    pattern: {
+                      value: /^[A-Za-z0-9]+$/,
+                      message: "Invalid National ID format",
+                    },
+                  })}
+                  error={errors.request?.student?.nid?.message?.toString()}
+                  placeholder="National ID"
+                  className="-mt-1"
+                  theme="transparent"
+                />
+                {errors.request?.student?.nid && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student.nid.message?.toString()}
+                  </p>
+                )}
+              </label>
+
+              <label htmlFor="birthDate" className="block">
+                <Input
+                  {...register("request.student.birthDate", {
+                    required: "Date of birth is required",
+                    validate: (value) => {
+                      const today = new Date();
+                      const birthDate = new Date(value);
+                      let age = today.getFullYear() - birthDate.getFullYear();
+                      const monthDifference =
+                        today.getMonth() - birthDate.getMonth();
+
+                      // Adjust age if the current month and day are before the birth month and day
+                      if (
+                        monthDifference < 0 ||
+                        (monthDifference === 0 &&
+                          today.getDate() < birthDate.getDate())
+                      ) {
+                        age--;
+                      }
+
+                      return age >= 20 || "You must be at least 20 years old";
+                    },
+                  })}
+                  error={errors.request?.student?.birthDate?.message?.toString()}
+                  type="date"
+                  placeholder="Date of birth"
+                  className="!mb-2 !mt-2"
+                  theme="transparent"
+                />
+                {errors.request?.student?.birthDate && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.request?.student.birthDate.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="nid" className="block">
+                <Input
+                  {...register("parentIdPhoto", {
+                    required: "parentIdPhoto is required",
+                  })}
+                  type="file"
+                  error={errors.parentIdPhoto?.message?.toString()}
+                  placeholder="parentIdPhoto"
+                  className="-mt-1"
+                  theme="transparent"
+                />
+                {errors.parentIdPhoto && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.parentIdPhoto.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="nid" className="block">
+                <Input
+                  {...register("studentIdPhoto", {
+                    required: "studentIdPhoto is required",
+                  })}
+                  type="file"
+                  error={errors.studentIdPhoto?.message?.toString()}
+                  placeholder="studentIdPhoto"
+                  className="-mt-1"
+                  theme="transparent"
+                />
+                {errors.studentIdPhoto && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.studentIdPhoto.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="nid" className="block">
+                <Input
+                  {...register("studentProfilePhoto", {
+                    required: "studentProfilePhoto is required",
+                  })}
+                  type="file"
+                  error={errors.studentProfilePhoto?.message?.toString()}
+                  placeholder="studentProfilePhoto"
+                  className="-mt-1"
+                  theme="transparent"
+                />
+                {errors.studentProfilePhoto && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.studentProfilePhoto.message?.toString()}
+                  </p>
+                )}
+              </label>
+              <label htmlFor="nid" className="block">
+                <Input
+                  {...register("studentCertificatesOfAchievement", {
+                    required: "studentCertificatesOfAchievement is required",
+                  })}
+                  type="file"
+                  error={errors.studentCertificatesOfAchievement?.message?.toString()}
+                  placeholder="studentCertificatesOfAchievement"
+                  className="-mt-1"
+                  theme="transparent"
+                />
+                {errors.studentCertificatesOfAchievement && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.studentCertificatesOfAchievement.message?.toString()}
+                  </p>
+                )}
+              </label>
+              
+
+<div className="mt-8 flex justify-center space-x-4">
+              <Button type="button" onClick={prevStep} theme="outline">
+                  Prev
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Sign Up..." : "Sign Up"}
+                </Button>
+              </div>
+            </> 
           )}
           {/* Sign-in Prompt */}
           <div className="mt-6 flex items-center justify-center space-x-2">

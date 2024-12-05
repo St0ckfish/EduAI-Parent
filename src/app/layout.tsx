@@ -1,14 +1,15 @@
 "use client";
 import "~/styles/globals.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GeistSans } from "geist/font/sans";
-import Notification from "~/_components/Notifications";
-import "react-toastify/dist/ReactToastify.css";
 import { TRPCReactProvider } from "~/trpc/react";
 import NavBar from "../_components/navBar";
 import { usePathname } from "next/navigation";
-import ThemeProvider from "./providers/themeProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import Notification from "~/_components/Notifications";
+import "react-toastify/dist/ReactToastify.css";
+import WithAuth from "~/_components/Auth/WithAuth";
+import ThemeProvider from "./providers/themeProvider";
 
 export default function RootLayout({
   children,
@@ -35,13 +36,15 @@ export default function RootLayout({
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       </head>
       <body className="bg-bgSecondary">
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {!isLoginPage && <NavBar />}
-            <Notification />
-            <TRPCReactProvider>{children}</TRPCReactProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
+        <WithAuth excludePaths={["/login", "/signup"]}>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              {!isLoginPage && <NavBar />}
+              <Notification />
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </WithAuth>
       </body>
     </html>
   );

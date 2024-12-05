@@ -18,6 +18,10 @@ const config = {
     defaultLocale: "en",
   },
   transpilePackages: ["geist"],
+  
+  images: {
+    domains: ["eduai.vitaparapharma.com"], // Add your allowed domains here
+  },
 };
 
 export default config;

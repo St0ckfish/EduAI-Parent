@@ -139,12 +139,12 @@ const NavBar = () => {
     { href: "/attendance", icon: CiSquareCheck, label: "My attendance" },
   ];
 
-  if (!isClient)
-    return (
-      <div className="absolute left-0 top-0 z-[9999] flex h-screen w-full items-center justify-center bg-bgPrimary">
-        <Spinner />
-      </div>
-    );
+  // if (!isClient)
+  //   return (
+  //     <div className="absolute left-0 top-0 z-[9999] flex h-screen w-full items-center justify-center bg-bgPrimary">
+  //       <Spinner />
+  //     </div>
+  //   );
 
   return (
     <>
