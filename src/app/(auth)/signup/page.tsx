@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import React,{ type ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import Input from "~/_components/Input";
 import Button from "~/_components/Button";
 import { Text } from "~/_components/Text";
@@ -100,18 +100,18 @@ const Signup = () => {
 
   const countryOptions = countryData?.data
     ? Object.entries(countryData.data).map(
-        ([key, value]: [string, string]) => ({
-          value: key,
-          label: `+${key} (${value})`,
-        }),
-      )
+      ([key, value]: [string, string]) => ({
+        value: key,
+        label: `+${key} (${value})`,
+      }),
+    )
     : [];
 
   const optionsNationalities = nationalityData?.data
     ? Object.entries(nationalityData.data).map(([key, value]) => ({
-        value: key,
-        label: `${value}`,
-      }))
+      value: key,
+      label: `${value}`,
+    }))
     : [];
 
   const { mutate, isPending: isSubmitting } = useSignUp();
@@ -156,7 +156,7 @@ const Signup = () => {
         eduSystemId: "1",
         hasScholarship: "0",
         department: "SCIENTIFIC",
-        studyLevel:  "GRADE11",
+        studyLevel: "GRADE11",
         subDepartment: "MATHEMATICAL_SCIENCES",
       }
     };
@@ -207,7 +207,7 @@ const Signup = () => {
         break;
       case 5:
         fieldsToValidate = [
-          "gender", 
+          "gender",
           "nid",
           "birthDate",
           "countryCode",
@@ -217,9 +217,9 @@ const Signup = () => {
       default:
         break;
     }
-    
+
     const mappedFieldsToValidate = fieldsToValidate.map(field => `request.${field}` as const);
-    
+
     const result = await trigger(mappedFieldsToValidate);
     return result;
   };
@@ -256,9 +256,8 @@ const Signup = () => {
             {[1, 2, 3, 4, 5, 6, 7].map((stepIndex, index) => (
               <React.Fragment key={stepIndex}>
                 <div
-                  className={`relative flex h-8 w-8 items-center justify-center rounded-full ${
-                    index < step ? "bg-primary" : "bg-gray-300"
-                  } font-bold text-white`}
+                  className={`relative flex h-8 w-8 items-center justify-center rounded-full ${index < step ? "bg-primary" : "bg-gray-300"
+                    } font-bold text-white`}
                 >
                   {stepIndex}
                   <Text className="absolute -left-[15px] top-10 w-[100px] text-[10px] text-textPrimary sm:left-[-22px] sm:w-[120px] sm:text-xs">
@@ -267,9 +266,8 @@ const Signup = () => {
                 </div>
                 {index < 6 && (
                   <hr
-                    className={`h-[5px] w-20 ${
-                      index < step - 1 ? "bg-primary" : "bg-gray-300"
-                    } sm:w-[105px]`}
+                    className={`h-[5px] w-20 ${index < step - 1 ? "bg-primary" : "bg-gray-300"
+                      } sm:w-[105px]`}
                   />
                 )}
               </React.Fragment>
@@ -555,7 +553,7 @@ const Signup = () => {
           )}
           {step === 5 && (
             <>
-              
+
               <label htmlFor="gender" className="block">
                 <Controller
                   name="request.gender"
@@ -712,7 +710,7 @@ const Signup = () => {
           )}
           {step === 6 && (
             <>
-            <Text font="medium" className="mb-10">Student Data</Text>
+              <Text font="medium" className="mb-10">Student Data</Text>
               <label htmlFor="username" className="">
                 <Input
                   {...register("request.student.username", {
@@ -844,7 +842,7 @@ const Signup = () => {
               </label>
 
               <div className="mt-8 flex justify-center space-x-4">
-              <Button type="button" onClick={prevStep} theme="outline">
+                <Button type="button" onClick={prevStep} theme="outline">
                   Prev
                 </Button>
                 <Button
@@ -860,7 +858,7 @@ const Signup = () => {
           {step === 7 && (
             <>
 
-<label htmlFor="nid" className="block">
+              <label htmlFor="nid" className="block">
                 <Input
                   {...register("request.student.nid", {
                     required: "National ID is required",
@@ -925,6 +923,7 @@ const Signup = () => {
                   error={errors.parentIdPhoto?.message?.toString()}
                   placeholder="parentIdPhoto"
                   className="-mt-1"
+                  label="parentIdPhoto"
                   theme="transparent"
                 />
                 {errors.parentIdPhoto && (
@@ -941,6 +940,7 @@ const Signup = () => {
                   type="file"
                   error={errors.studentIdPhoto?.message?.toString()}
                   placeholder="studentIdPhoto"
+                  label="studentIdPhoto"
                   className="-mt-1"
                   theme="transparent"
                 />
@@ -959,6 +959,7 @@ const Signup = () => {
                   error={errors.studentProfilePhoto?.message?.toString()}
                   placeholder="studentProfilePhoto"
                   className="-mt-1"
+                  label="studentProfilePhoto"
                   theme="transparent"
                 />
                 {errors.studentProfilePhoto && (
@@ -967,7 +968,7 @@ const Signup = () => {
                   </p>
                 )}
               </label>
-              <label htmlFor="nid" className="block">
+              <label htmlFor="nid" className="block text-start">
                 <Input
                   {...register("studentCertificatesOfAchievement", {
                     required: "studentCertificatesOfAchievement is required",
@@ -976,6 +977,7 @@ const Signup = () => {
                   error={errors.studentCertificatesOfAchievement?.message?.toString()}
                   placeholder="studentCertificatesOfAchievement"
                   className="-mt-1"
+                  label="studentCertificatesOfAchievement"
                   theme="transparent"
                 />
                 {errors.studentCertificatesOfAchievement && (
@@ -984,17 +986,17 @@ const Signup = () => {
                   </p>
                 )}
               </label>
-              
 
-<div className="mt-8 flex justify-center space-x-4">
-              <Button type="button" onClick={prevStep} theme="outline">
+
+              <div className="mt-8 flex justify-center space-x-4">
+                <Button type="button" onClick={prevStep} theme="outline">
                   Prev
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? "Sign Up..." : "Sign Up"}
                 </Button>
               </div>
-            </> 
+            </>
           )}
           {/* Sign-in Prompt */}
           <div className="mt-6 flex items-center justify-center space-x-2">
