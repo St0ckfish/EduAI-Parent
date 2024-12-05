@@ -363,6 +363,7 @@ export type TeacherProfile = {
   success: boolean;
   message: string;
   data: {
+    phoneNumber: string;
     id: number;
     username: string;
     email: string;
@@ -374,8 +375,9 @@ export type TeacherProfile = {
     nationality: string;
     religion: string;
     birthDate: string | null;
-    regionId: number;
+    regionId: string;
     number: string;
+    phone: string;
     name: string;
     about: string;
     qualification: string;
@@ -384,20 +386,36 @@ export type TeacherProfile = {
     authorities: string[];
     address: string | null;
     subjects: string[];
+    countryCode: string;
   };
 };
 
 export type TeacherProfileUpdate = {
-  username: string;
-  email: string;
-  name_en: string;
-  name_fr: string;
-  name_ar: string;
-  number?: string;
-  gender: "MALE" | "FEMALE";
-  nationality: string;
-  qualification?: string;
-  subjects: string[];
+  // username: string;
+  // email: string;
+  // name_en: string;
+  // name_fr: string;
+  // name_ar: string;
+  // number?: string;
+  // phoneNumber?: string;
+  // gender: "MALE" | "FEMALE";
+  // nationality: string;
+  // qualification?: string;
+  // subjects: string[];
+  name_en: string,
+  name_ar: string,
+  name_fr: string,
+  username: string,
+  birthDate: string,
+  nid: string,
+  religion: string,
+  nationality: string,
+  gender: string,
+  regionId: string,
+  email: string,
+  about: string,
+  phone?: string,
+  countryCode?: string
 };
 
 // password
