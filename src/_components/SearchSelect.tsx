@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef } from "react";
 
 interface SearchableSelectProps {
@@ -7,6 +8,8 @@ interface SearchableSelectProps {
   options: { value: string | number; label: string }[];
   placeholder?: string;
   error?: string;
+  bgColor?: string; // Background color
+  border?: string;  // Border style
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -16,6 +19,8 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   options,
   placeholder,
   error,
+  bgColor = "bgSecondary", // Default background
+  border = "border-borderSecondary", // Default border
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -83,13 +88,13 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
           onChange={handleInputChange}
           onFocus={() => setIsOpen(true)}
           onBlur={onBlur}
-          className={`w-full rounded-lg border ${
-            error ? "border-red-500" : "border-gray-300"
-          } bg-bgSecondary p-3 text-gray-700 outline-none transition duration-200 ease-in`}
+          className={`w-full rounded-lg border ${border} ${bgColor} p-3 text-textPrimary outline-none transition duration-200 ease-in ${
+            error ? "border-error" : ""
+          }`}
         />
         <div className="absolute inset-y-0 right-3 flex items-center px-2">
           <svg
-            className="h-5 w-4 text-bgPowderBlue outline-none"
+            className="h-5 w-4 text-textSecondary outline-none"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -108,15 +113,13 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 <li
                   key={option.value}
                   onClick={() => handleOptionClick(option.value, option.label)}
-                  className="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="cursor-pointer p-2 hover:bg-bgSecondary/75"
                 >
                   {option.label}
                 </li>
               ))
             ) : (
-              <li className="p-2 text-gray-500 dark:text-gray-300">
-                No data found
-              </li>
+              <li className="p-2 text-textSecondary">No data found</li>
             )}
           </ul>
         )}

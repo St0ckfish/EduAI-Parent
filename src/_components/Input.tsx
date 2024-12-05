@@ -10,7 +10,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string | undefined;
   className?: string;
   dir?: string;
-  theme?: "solid" | "transparent";
+  theme?: "solid" | "transparent" | "comment";
+  border?: "primary" | "gray" | "none";
+  rounded?: "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "full"; 
 }
 
 const Input: React.FC<InputProps> = ({
@@ -21,6 +23,8 @@ const Input: React.FC<InputProps> = ({
   register,
   className = "",
   theme = "solid",
+  border,
+  rounded = "lg",
   ...props
 }) => {
   const [inputType, setInputType] = useState(type);
@@ -31,21 +35,32 @@ const Input: React.FC<InputProps> = ({
 
   const themeClasses =
     theme === "transparent"
-      ? "bg-transparent border-bgPowderBlue"
-      : "bg-white border-borderSecondary";
+      ? "bg-transparent"
+      : theme === "comment"
+      ? "bg-comment rounded-xl"
+      : "bg-bgSecondary";
+
+  const borderClass =
+      border === "none" ? "" : 
+      type === "comment" ? "rounded-2xl" : 
+      border === "gray" ? "border border-borderPrimary" : "border border-borderSecondary";
+  
+  const roundedClass = `rounded-${rounded}`; 
 
   return (
     <label className={`grid w-full gap-1 text-end`}>
-      {label && <p className="text-purpleMain font-medium">{label}</p>}
-      <div className="relative w-full text-start">
+      {label && <p className="text-textPrimary text-start font-medium">{label}</p>}
+      <div className="relative w-full">
         <input
           {...props}
           type={inputType}
           {...register}
           dir={dir}
-          className={`w-full rounded-lg border px-4 py-3 ${inputType === "date" ? "mb-1" : ""} outline-none ${
-            error ? "border-error bg-transparent" : themeClasses
-          } ${className}`}
+          className={`w-full px-4 py-3 ${
+            inputType === "date" ? "mb-1" : ""
+          } outline-none text-textPrimary placeholder:text-textSecondary ${
+            error ? "border border-error bg-transparent" : `${themeClasses} ${borderClass}`
+          } ${roundedClass} ${className}`}
         />
         {type === "password" && (
           <button

@@ -9,6 +9,7 @@ import { useState } from "react";
 import Notification from "~/_components/Notifications";
 import "react-toastify/dist/ReactToastify.css";
 import WithAuth from "~/_components/Auth/WithAuth";
+import ThemeProvider from "./providers/themeProvider";
 
 export default function RootLayout({
   children,
@@ -24,20 +25,26 @@ export default function RootLayout({
     pathname === "/confirm-account" ||
     pathname === "/choose-account";
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html
+      lang="en"
+      className={`${GeistSans.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <title>EduAI Parent</title>
         <meta name="description" content="Edu AI-Parent" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       </head>
       <body className="bg-bgSecondary">
-      <WithAuth excludePaths={['/login', '/signup']}>
-      <QueryClientProvider client={queryClient}>
-        {!isLoginPage && <NavBar />}
-        <Notification />
-        <TRPCReactProvider>{children}</TRPCReactProvider>
-      </QueryClientProvider>
-      </WithAuth>
+        <WithAuth excludePaths={["/login", "/signup"]}>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              {!isLoginPage && <NavBar />}
+              <Notification />
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </WithAuth>
       </body>
     </html>
   );

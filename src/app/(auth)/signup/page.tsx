@@ -115,15 +115,6 @@ const Signup = () => {
     : [];
 
   const { mutate, isPending: isSubmitting } = useSignUp();
-  const [fileName, setFileName] = useState("");
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const target = e.target as HTMLInputElement;
-    const file = target.files?.[0]; 
-    if (file) {
-      setFileName(file.name); 
-    }
-  };
   const onSubmit = (data: SignUpFormData) => {
     const formData = new FormData();
 
@@ -161,6 +152,7 @@ const Signup = () => {
         nid: data.request.student.nid,
         password: data.request.student.password,
         relationshipToStudent: "FATHER",
+        // TODO: Make it dynamic
         eduSystemId: "1",
         hasScholarship: "0",
         department: "SCIENTIFIC",
