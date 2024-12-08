@@ -47,7 +47,7 @@ const Grades = () => {
             <SelectValue placeholder="Select Academic Year" />
           </SelectTrigger>
           <SelectContent>
-            {academicYears?.data?.map((year) => (
+            {academicYears?.data?.map((year: any) => (
               <SelectItem key={year.id} value={year.id.toString()}>
                 {year.name}
               </SelectItem>
@@ -82,13 +82,14 @@ const Grades = () => {
           <SelectTrigger className={`w-full border bg-white border-[#f0efef]`}>
             <SelectValue placeholder="Select Student" />
           </SelectTrigger>
+          {students?.data?.length && (
           <SelectContent>
             {students?.data?.map((student:any)=>(
               <SelectItem key={student.studentId} value={student.studentId.toString()}>
                 {student.name}
               </SelectItem>
             ))}
-          </SelectContent>
+          </SelectContent>)}
         </Select>
       </div>
 

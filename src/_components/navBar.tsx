@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AiFillHome } from "react-icons/ai";
 import { FiFlag } from "react-icons/fi";
-import { HiOutlineSquares2X2 } from "react-icons/hi2";
 import { FaBusAlt } from "react-icons/fa";
-import { CiSquareCheck } from "react-icons/ci";
+import { FaPencilAlt } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { MdAttachMoney } from "react-icons/md";
 import { useTheme } from "next-themes";
@@ -135,7 +134,7 @@ const NavBar = () => {
     { href: "/bus", icon: FaBusAlt, label: "Bus Tracker" },
     { href: "/finance", icon: MdAttachMoney, label: "Finance" },
     { href: "/complaint", icon: FiFlag, label: "Complaint" },
-    { href: "/attendance", icon: CiSquareCheck, label: "My attendance" },
+    { href: "/exam", icon: FaPencilAlt, label: "Exam" },
   ];
 
   // if (!isClient)
@@ -437,64 +436,6 @@ const NavBar = () => {
                       url={url}
                     />
                   ))}
-                  <li className="group relative">
-                    <button
-                      onClick={toggleNavbar5}
-                      className={`flex ${!small ? "w-full" : ""} text-md group mt-4 items-center gap-x-3.5 rounded-lg px-2.5 py-2 font-sans font-bold text-secondary hover:bg-bgSecondary hover:text-primary`}
-                    >
-                      <HiOutlineSquares2X2
-                        className={`h-10 w-10 ${small ? "h-6 w-6" : "pl-4"} ${isOpen5 ? `${small ? "" : "border-l-2"} border-primary text-primary` : ""} text-textPrimary`}
-                      />
-                      {!small && (
-                        <p
-                          className={`text-textPrimary ${isOpen5 ? "text-primary" : ""}`}
-                        >
-                          Menu
-                        </p>
-                      )}
-                    </button>
-                    {isOpen5 && (
-                      <ul
-                        className={`${small ? "hidden w-fit translate-x-5 whitespace-nowrap rounded-xl bg-bgPrimary p-2 group-hover:grid" : ""} mx-9 mt-2 grid gap-2 text-[14px] font-semibold`}
-                      >
-                        <Link
-                          className={`hover:text-primary ${url === "/homework" ? "text-primary" : ""}`}
-                          href="/homework"
-                        >
-                          {" "}
-                          Homework{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/textbooks" ? "text-primary" : ""}`}
-                          href="/textbooks"
-                        >
-                          {" "}
-                          Textbooks{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/grades" ? "text-primary" : ""}`}
-                          href="/grades"
-                        >
-                          {" "}
-                          Grades{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/exam" ? "text-primary" : ""}`}
-                          href="/exam"
-                        >
-                          {" "}
-                          Exam{" "}
-                        </Link>
-                        <Link
-                          className={`hover:text-primary ${url === "/exercises" ? "text-primary" : "textPrimary"}`}
-                          href="/exercises"
-                        >
-                          {" "}
-                          Exercises{" "}
-                        </Link>
-                      </ul>
-                    )}
-                  </li>
                 </ul>
               </nav>
             </div>
