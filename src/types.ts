@@ -507,6 +507,7 @@ export type Material = {
 // complaint
 
 export type ComplaintResponse = {
+  teacherId?: number;
   studentId: number;
   subject: string;
   message: string;

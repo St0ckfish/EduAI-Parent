@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { ParentStudentsResponse, StudentsResponse, StudentsWithGradesResponse } from "~/types";
-import { getStudents, getStudentsSimpleData, getStudentsWithGrades } from "../features/student";
+import { fetchStudentTeachers, getStudents, getStudentsSimpleData, getStudentsWithGrades } from "../features/student";
 
 export const useGetStudents = (
   options?: UseQueryOptions<StudentsResponse, Error>
@@ -9,6 +9,18 @@ export const useGetStudents = (
     queryKey: ["students"], 
     queryFn: getStudents,
     ...options,
+  });
+};
+
+export const useGetStudentTeachers = (
+  studentId: string,
+  options?: UseQueryOptions<any, Error>
+) => {
+  return useQuery<any, Error>({
+    queryKey: ['student-teachers', studentId], // queryKey
+    queryFn: () => fetchStudentTeachers(studentId), // query function
+    enabled: !!studentId, // Prevent query from running if studentId is not provided
+    ...options, // Additional options
   });
 };
 

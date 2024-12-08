@@ -6,6 +6,11 @@ export const getStudents = async (): Promise<StudentsResponse> => {
   return response.data;
 };
 
+export const fetchStudentTeachers = async (studentId: string) => {
+  const response = await axiosInstance.get(`/api/v1/complain/student-teachers?student-id=${studentId}`);
+  return response.data; 
+};
+
 export const getStudentsSimpleData = async (): Promise<ParentStudentsResponse> => {
   const response = await axiosInstance.get<ParentStudentsResponse>("/api/v1/parent/students");
   return response.data;
