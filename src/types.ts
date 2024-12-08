@@ -654,7 +654,7 @@ export type CustomEvent = {
   startDate: string;
   endDate: string;
   isAttendee: boolean;
-  attendees: any[];
+  attendees: EventAttendee[];
 };
 
 export type BankAccount = {
@@ -787,9 +787,18 @@ export type ExamById = {
 
 export type ExamResultsResponse = ExamResult[];
 
-
+// Type for an individual academic year
 export type AcademicYear = {
-  id: number,
-  name: string,
-  active: boolean
-}
+  id: number;
+  name: string;
+  active: boolean;
+};
+
+// Type for the full API response
+export type AcademicYearResponse = {
+  success: boolean;
+  message: string;
+  data: AcademicYear[];
+};
+
+
