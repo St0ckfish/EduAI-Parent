@@ -8,6 +8,8 @@ import { FaBusAlt } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { MdAttachMoney } from "react-icons/md";
+import { IoPersonSharp } from "react-icons/io5";
+import { FaGraduationCap } from "react-icons/fa6";
 import { useTheme } from "next-themes";
 import { FaStar } from "react-icons/fa6";
 import { Switch } from "~/components/ui/switch";
@@ -131,6 +133,8 @@ const NavBar = () => {
   const navLinks = [
     { href: "/", icon: AiFillHome, label: "Home" },
     { href: "/grades", icon: FaStar, label: "Grades" },
+    { href: "/academic", icon: FaGraduationCap, label: "Academic" },
+    { href: "/follow-up", icon: IoPersonSharp, label: "Follow up" },
     { href: "/bus", icon: FaBusAlt, label: "Bus Tracker" },
     { href: "/finance", icon: MdAttachMoney, label: "Finance" },
     { href: "/complaint", icon: FiFlag, label: "Complaint" },
