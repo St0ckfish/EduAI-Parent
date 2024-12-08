@@ -1,5 +1,7 @@
 // src/types/advice.ts
 
+import { number } from "zod";
+
 export type Advice = {
   id: number;
   title: string;
@@ -167,6 +169,49 @@ export type Upcoming_Previous_Exams = {
   message: string;
   data: Fee[];
 };
+
+export interface DailyExam {
+  id: number;
+  courseName: string;
+  topicName: string;
+  correctPoints: number;
+  totalPoints: number;
+  gradeLetter: string;
+}
+
+export interface DailyExamResponse {
+  success: boolean;
+  message: string;
+  data: DailyExam[];
+}
+
+export interface DailyExamAttempt {
+  id: number;
+  submittedAt: string;
+  grade: number;
+  totalPoints: number;
+}
+
+export interface DailyExamAttemptsResponse {
+  success: boolean;
+  message: string;
+  data: DailyExamAttempt[];
+}
+
+interface AttemptAnswer {
+  question: string;
+  questionType: "MCQ" | "TF";
+  options: string[];
+  studentAnswer: string;
+  correctAnswer: string;
+  isAnsweredCorrectly: boolean;
+}
+
+export interface AttemptAnswersResponse {
+  success: boolean;
+  message: string;
+  data: AttemptAnswer[];
+}
 
 export enum AttendanceStatus {
   ABSENT = "ABSENT",
@@ -736,7 +781,15 @@ export type ExamById = {
   className: string;
   examTypeName: string;
   examLegalTypeName: string;
+  examGrade: number;
 };
 
 
 export type ExamResultsResponse = ExamResult[];
+
+
+export type AcademicYear = {
+  id: number,
+  name: string,
+  active: boolean
+}

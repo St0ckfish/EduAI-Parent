@@ -3,8 +3,8 @@ import type {
   UseMutationOptions,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import type { ExamFormData, ExamListResponse, ExamResultsResponse, Upcoming_Previous_Exams, UpcomingExamByIdResponse } from "../../types";
-import { createExam, fetchAllExams, fetchAllPreviousExams, fetchAllUpcomingExams, fetchExamResults, fetchPreviousExamsByStudentId, fetchUpcomingExamsByStudentId, putGrade } from "../features/exam";
+import type { AttemptAnswersResponse, DailyExamAttemptsResponse, DailyExamResponse, ExamFormData, ExamListResponse, ExamResultsResponse, Upcoming_Previous_Exams, UpcomingExamByIdResponse } from "../../types";
+import { createExam, fetchAllExams, fetchAllPreviousExams, fetchAllUpcomingExams, fetchAttemptAnswers, fetchDailyExamAttempts, fetchDailyExamDataByStudentId, fetchExamResults, fetchPreviousExamsByStudentId, fetchUpcomingExamsByStudentId, putGrade } from "../features/exam";
 
 export const useGetAllExams = (
   options?: UseQueryOptions<ExamListResponse, Error>,
@@ -95,3 +95,41 @@ export const usePutGrade = (
   });
 };
 
+export const useGetDailyExamData = (
+  id: string,
+  options?: UseQueryOptions<DailyExamResponse, Error> 
+) => {
+  return useQuery<DailyExamResponse, Error>({
+    queryKey: ["daily-exam-data", id], 
+    queryFn: () => fetchDailyExamDataByStudentId(id),
+    enabled: !!id, 
+    ...options,
+  });
+};
+
+
+export const useGetDailyExamAttempts = (
+  studentId: string,
+  examId: string,
+  options?: UseQueryOptions<DailyExamAttemptsResponse, Error>
+) => {
+  return useQuery<DailyExamAttemptsResponse, Error>({
+    queryKey: ["daily-exam-attempts", studentId, examId],
+    queryFn: () => fetchDailyExamAttempts(studentId, examId),
+    enabled: !!studentId && !!examId, 
+    ...options,
+  });
+};
+
+export const useGetAttemptAnswers = (
+  studentId: string,
+  attemptId: string,
+  options?: UseQueryOptions<AttemptAnswersResponse, Error>
+) => {
+  return useQuery<AttemptAnswersResponse, Error>({
+    queryKey: ["attempt-answers", studentId, attemptId],
+    queryFn: () => fetchAttemptAnswers(studentId, attemptId),
+    enabled: !!studentId && !!attemptId,
+    ...options,
+  });
+};

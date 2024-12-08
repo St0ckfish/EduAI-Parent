@@ -1,5 +1,5 @@
 import axiosInstance from "../axios";
-import type { ExamFormData, ExamListResponse, ExamResultsResponse, Upcoming_Previous_Exams, UpcomingExamByIdResponse } from "../../types";
+import type { AttemptAnswersResponse, DailyExamAttemptsResponse, DailyExamResponse, ExamFormData, ExamListResponse, ExamResultsResponse, Upcoming_Previous_Exams, UpcomingExamByIdResponse } from "../../types";
 
 export const fetchAllExams = async (): Promise<ExamListResponse> => {
     const response = await axiosInstance.get<ExamListResponse>(
@@ -59,5 +59,30 @@ export const createExam = async (formData: Partial<ExamFormData>): Promise<ExamF
 
   export const putGrade = async (examResultId: string, scoreData: { score: number; scoreDate: string }) => {
     const response = await axiosInstance.put(`/api/v1/exam-results/${examResultId}`, scoreData);
+    return response.data;
+  };
+
+  export const fetchDailyExamDataByStudentId = async (id: string): Promise<DailyExamResponse> => {
+    const response = await axiosInstance.get(`/api/v1/daily-exam/parent/${id}`);
+    return response.data;
+  };
+
+  export const fetchDailyExamAttempts = async (
+    studentId: string,
+    examId: string
+  ): Promise<DailyExamAttemptsResponse> => {
+    const response = await axiosInstance.get(
+      `/api/v1/daily-exam/parent/attempts-of-exam?student-id=${studentId}&exam-id=${examId}`
+    );
+    return response.data;
+  };
+
+  export const fetchAttemptAnswers = async (
+    studentId: string,
+    attemptId: string
+  ): Promise<AttemptAnswersResponse> => {
+    const response = await axiosInstance.get(
+      `/api/v1/daily-exam/parent/answers-of-attempt?student-id=${studentId}&attempt-id=${attemptId}`
+    );
     return response.data;
   };

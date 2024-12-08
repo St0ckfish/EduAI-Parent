@@ -76,8 +76,7 @@ const Exam = () => {
                 >
                   {exam.courseName}
                 </th>
-                {/* TODO: Add score when the API is ready to return it */}
-                <td className="whitespace-nowrap px-6 py-4">Score (Waiting the API)</td>
+                <td className="whitespace-nowrap px-6 py-4">{exam.examGrade}</td>
                 <td className="whitespace-nowrap px-6 py-4">{exam.className}</td>
                 <td className="whitespace-nowrap px-6 py-4">
                   {exam.examTypeName}
