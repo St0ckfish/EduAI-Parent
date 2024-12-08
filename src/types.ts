@@ -173,43 +173,43 @@ export enum AttendanceStatus {
   // Add other potential statuses if needed
 }
 
-export type AbsenceReason = 'OTHER';
+export type AbsenceReason = "OTHER";
 
 // Type for individual session attendance record
 export type SessionAttendanceRecord = {
-    id: number;
-    studentName: string;
-    status: AttendanceStatus;
-    absenceReason: AbsenceReason | null;
+  id: number;
+  studentName: string;
+  status: AttendanceStatus;
+  absenceReason: AbsenceReason | null;
 };
 
 // Type for the full API response
 export type SessionAttendanceResponse = {
-    success: boolean;
-    message: string;
-    data: {
-        content: SessionAttendanceRecord[];
-        totalElementsCount: number;
-        totalPagesCount: number;
-        pageElementsCount: number;
-        pageSize: number;
-        pageNumber: number;
-        firstPage: boolean;
-        lastPage: boolean;
-        emptyPage: boolean;
-        sortedPage: boolean;
-    };
+  success: boolean;
+  message: string;
+  data: {
+    content: SessionAttendanceRecord[];
+    totalElementsCount: number;
+    totalPagesCount: number;
+    pageElementsCount: number;
+    pageSize: number;
+    pageNumber: number;
+    firstPage: boolean;
+    lastPage: boolean;
+    emptyPage: boolean;
+    sortedPage: boolean;
+  };
 };
 
 // Enum for day names
 export enum DayName {
   MONDAY = "MONDAY",
-  TUESDAY = "TUESDAY", 
+  TUESDAY = "TUESDAY",
   WEDNESDAY = "WEDNESDAY",
   THURSDAY = "THURSDAY",
   FRIDAY = "FRIDAY",
   SATURDAY = "SATURDAY",
-  SUNDAY = "SUNDAY"
+  SUNDAY = "SUNDAY",
 }
 
 // Interface for individual attendance record
@@ -219,7 +219,7 @@ export type AttendanceRecord = {
   status: AttendanceStatus;
   date: string;
   dayName: DayName;
-}
+};
 
 // Interface for the full attendance API response
 export type AttendanceResponse = {
@@ -236,8 +236,8 @@ export type AttendanceResponse = {
     lastPage: boolean;
     emptyPage: boolean;
     sortedPage: boolean;
-  }
-}
+  };
+};
 
 export type AttendanceNumbersResponse = {
   success: boolean;
@@ -247,15 +247,15 @@ export type AttendanceNumbersResponse = {
     totalEarlyDeparture: number;
     totalPresent: number;
     totalLeaveDays: number;
-  }
-}
+  };
+};
 
-export type LeaveRecord ={
+export type LeaveRecord = {
   leaveBalance: number;
   applyDays: number;
   startDate: string;
   endDate: string;
-}
+};
 
 // Interface for the full leave attendance API response
 export type LeaveAttendanceResponse = {
@@ -272,8 +272,8 @@ export type LeaveAttendanceResponse = {
     lastPage: boolean;
     emptyPage: boolean;
     sortedPage: boolean;
-  }
-}
+  };
+};
 
 export type Attachment = {
   id: string;
@@ -402,20 +402,20 @@ export type TeacherProfileUpdate = {
   // nationality: string;
   // qualification?: string;
   // subjects: string[];
-  name_en: string,
-  name_ar: string,
-  name_fr: string,
-  username: string,
-  birthDate: string,
-  nid: string,
-  religion: string,
-  nationality: string,
-  gender: string,
-  regionId: string,
-  email: string,
-  about: string,
-  phone?: string,
-  countryCode?: string
+  name_en: string;
+  name_ar: string;
+  name_fr: string;
+  username: string;
+  birthDate: string;
+  nid: string;
+  religion: string;
+  nationality: string;
+  gender: string;
+  regionId: string;
+  email: string;
+  about: string;
+  phone?: string;
+  countryCode?: string;
 };
 
 // password
@@ -456,46 +456,46 @@ export type SessionExplainedResponse = {
   data: SessionExplainedItem[];
 };
 
-export type ComplaintType = 'Teacher to student' | 'Parent to teacher';
+export type ComplaintType = "Teacher to student" | "Parent to teacher";
 
 // Type for individual complaint
 export type Complaint = {
-    id: number;
-    subject: string;
-    message: string;
-    deleted: boolean;
-    approved: boolean;
-    type: ComplaintType;
-    creationDateTime: string;
-    updateDateTime: string;
-    teacherId: number;
-    teacherName: string;
-    studentId: number;
-    studentName: string;
-    isVoiceNoteExists: boolean;
-    viewVoiceNoteLink: string;
-    downloadVoiceNoteLink: string;
+  id: number;
+  subject: string;
+  message: string;
+  deleted: boolean;
+  approved: boolean;
+  type: ComplaintType;
+  creationDateTime: string;
+  updateDateTime: string;
+  teacherId: number;
+  teacherName: string;
+  studentId: number;
+  studentName: string;
+  isVoiceNoteExists: boolean;
+  viewVoiceNoteLink: string;
+  downloadVoiceNoteLink: string;
 };
 
 // Type for the full API response
 export type ComplainsResponse = {
-    success: boolean;
-    message: string;
-    data: {
-        content: Complaint[];
-        totalElementsCount: number;
-        totalPagesCount: number;
-        pageElementsCount: number;
-        pageSize: number;
-        pageNumber: number;
-        firstPage: boolean;
-        lastPage: boolean;
-        emptyPage: boolean;
-        sortedPage: boolean;
-    };
+  success: boolean;
+  message: string;
+  data: {
+    content: Complaint[];
+    totalElementsCount: number;
+    totalPagesCount: number;
+    pageElementsCount: number;
+    pageSize: number;
+    pageNumber: number;
+    firstPage: boolean;
+    lastPage: boolean;
+    emptyPage: boolean;
+    sortedPage: boolean;
+  };
 };
 
-// Material 
+// Material
 
 export type Material = {
   sessionId: string;
@@ -507,11 +507,11 @@ export type Material = {
 // complaint
 
 export type ComplaintResponse = {
-    studentId: number,
-    subject: string,
-    message: string,
-    file?: File
-}
+  studentId: number;
+  subject: string;
+  message: string;
+  file?: File;
+};
 
 // Student
 
@@ -541,10 +541,37 @@ export type StudentsResponse = {
   };
 };
 
+export type StudentsWithGradesResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    students: Student[];
+    finalScore: number;
+  };
+};
+
+export type StudentSimpleData = {
+  studentId: number;
+  name: string;
+  grade: string;
+  profilePicture: string | null;
+};
+
+export type ParentStudentsResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    studentId: number;
+    name: string;
+    grade: string;
+    profilePicture: string | null; // "null" in JSON means it could be a string or null.
+  }[];
+};
+
 // Events
 
 export type EventAttendee = {
-  id: number; 
+  id: number;
 };
 
 export type Event = {
@@ -554,7 +581,7 @@ export type Event = {
   startDate: string;
   endDate: string;
   isAttendee: boolean;
-  attendees: EventAttendee[]; 
+  attendees: EventAttendee[];
 };
 
 export type EventsResponse = {
@@ -584,7 +611,6 @@ export type CustomEvent = {
   attendees: any[];
 };
 
-
 export type BankAccount = {
   id: number;
   createdDate: string;
@@ -600,16 +626,16 @@ export type BankAccountResponse = {
   success: boolean;
   message: string;
   data: {
-      content: BankAccount[];
-      totalElementsCount: number;
-      totalPagesCount: number;
-      pageElementsCount: number;
-      pageSize: number;
-      pageNumber: number;
-      firstPage: boolean;
-      lastPage: boolean;
-      emptyPage: boolean;
-      sortedPage: boolean;
+    content: BankAccount[];
+    totalElementsCount: number;
+    totalPagesCount: number;
+    pageElementsCount: number;
+    pageSize: number;
+    pageNumber: number;
+    firstPage: boolean;
+    lastPage: boolean;
+    emptyPage: boolean;
+    sortedPage: boolean;
   };
 };
 
@@ -622,7 +648,7 @@ export type BankAccountFormData = {
     depositDate: string;
   };
   file: File | null;
-}
+};
 
 export type ExamFormData = {
   name: string;
@@ -633,7 +659,7 @@ export type ExamFormData = {
   courseId: number;
   classroomId: number;
   examTypeId: number;
-}
+};
 
 export type SignUpFormData = {
   request: {
@@ -675,10 +701,41 @@ export type SignUpFormData = {
       language: string;
       department: string;
       subDepartment: string;
-    }
-  }
+    };
+  };
   parentIdPhoto: File | null;
   studentIdPhoto: File | null;
   studentProfilePhoto: File | null;
   studentCertificatesOfAchievement: File | null;
-}
+};
+
+export type ExamResult = {
+  id: number;
+  examId: number;
+  studentId: number;
+  studentName: string;
+  status: "PASSED" | "FAILED";
+  score: number;
+  scoreDate: string;
+};
+
+export type UpcomingExamByIdResponse = {
+  success: boolean;
+  message: string;
+  data: Exam[];
+};
+
+export type ExamById = {
+  id: number;
+  examDate: string; // Format: YYYY-MM-DD
+  examBeginning: string; // Format: HH:mm:ss or HH:mm:ss.SSS
+  examEnding: string; // Format: HH:mm:ss or HH:mm:ss.SSS
+  examName: string;
+  courseName: string;
+  className: string;
+  examTypeName: string;
+  examLegalTypeName: string;
+};
+
+
+export type ExamResultsResponse = ExamResult[];
