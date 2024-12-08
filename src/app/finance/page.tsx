@@ -1,13 +1,25 @@
 'use client'
+import { useState } from "react";
 import Button from "~/_components/Button";
 import Container from "~/_components/Container";
 import Spinner from "~/_components/Spinner";
 import { Text } from "~/_components/Text";
 import { useGetAllFees } from "~/APIs/hooks/useFees";
+import { useGetAllStudents } from "~/APIs/hooks/useGrades";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 const Finance = () => {
-  const { data: fees, isLoading: isFees } = useGetAllFees();
-
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  const { data: fees, isLoading: isFees } = useGetAllFees(
+    selectedStudent ?? ""
+  );
+  const { data: students, isLoading: isStudents } = useGetAllStudents();
   // Sort fees with unpaid/not fully paid at the top
   const sortedFees = fees?.data ? [...fees.data].sort((a, b) => {
     const unpaidStatuses = ['Not Paid', 'Not Fully Paid'];
@@ -21,6 +33,25 @@ const Finance = () => {
 
   return (
     <Container>
+      {/* Student Select */}
+<div className="mb-7">
+<Select 
+          value={selectedStudent ?? ""} 
+          onValueChange={setSelectedStudent}
+        >
+          <SelectTrigger className={`w-full border bg-white border-[#f0efef]`}>
+            <SelectValue placeholder="Select Student" />
+          </SelectTrigger>
+          {students?.data?.length && (
+          <SelectContent>
+            {students?.data?.map((student:any)=>(
+              <SelectItem key={student.studentId} value={student.studentId.toString()}>
+                {student.name}
+              </SelectItem>
+            ))}
+          </SelectContent>)}
+        </Select>
+</div>
       <div className="w-full overflow-x-hidden rounded-md bg-bgPrimary p-4">
         <Text font={"bold"} size={"4xl"}>Finance</Text>
         <div className="my-4">
