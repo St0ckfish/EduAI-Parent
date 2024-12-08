@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { useMutation, type UseMutationOptions, useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import { addAttendance, fetchUpcomingEvents, removeAttendance } from "../features/events";
-import { EventsResponse } from "../../types";
-import { AxiosError } from "axios";
+import { type EventsResponse } from "../../types";
+import { type AxiosError } from "axios";
 
 export const useUpcomingEvents = (options?: UseQueryOptions<EventsResponse, Error>) => {
   return useQuery<EventsResponse, Error>({

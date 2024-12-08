@@ -581,7 +581,7 @@ export type CustomEvent = {
   startDate: string;
   endDate: string;
   isAttendee: boolean;
-  attendees: any[];
+  attendees: EventAttendee[];
 };
 
 
@@ -682,3 +682,17 @@ export type SignUpFormData = {
   studentProfilePhoto: File | null;
   studentCertificatesOfAchievement: File | null;
 }
+
+// Type for an individual academic year
+export type AcademicYear = {
+  id: number;
+  name: string;
+  active: boolean;
+};
+
+// Type for the full API response
+export type AcademicYearResponse = {
+  success: boolean;
+  message: string;
+  data: AcademicYear[];
+};

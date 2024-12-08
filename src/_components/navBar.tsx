@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AiFillHome } from "react-icons/ai";
-import { RiCalendarScheduleFill } from "react-icons/ri";
 import { FiFlag } from "react-icons/fi";
 import { HiOutlineSquares2X2 } from "react-icons/hi2";
 import { FaBusAlt } from "react-icons/fa";
@@ -11,7 +10,7 @@ import { CiSquareCheck } from "react-icons/ci";
 import { usePathname } from "next/navigation";
 import { MdAttachMoney } from "react-icons/md";
 import { useTheme } from "next-themes";
-import Spinner from "./Spinner";
+import { FaStar } from "react-icons/fa6";
 import { Switch } from "~/components/ui/switch";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Cookie from "js-cookie";
@@ -132,7 +131,7 @@ const NavBar = () => {
 
   const navLinks = [
     { href: "/", icon: AiFillHome, label: "Home" },
-    { href: "/schedule", icon: RiCalendarScheduleFill, label: "My Schedule" },
+    { href: "/grades", icon: FaStar, label: "Grades" },
     { href: "/bus", icon: FaBusAlt, label: "Bus Tracker" },
     { href: "/finance", icon: MdAttachMoney, label: "Finance" },
     { href: "/complaint", icon: FiFlag, label: "Complaint" },
