@@ -13,16 +13,14 @@ import Input from "~/_components/Input";
 import Comment from "~/_components/Comment";
 import Button from "~/_components/Button";
 import React, { useEffect, useState } from "react";
-import { Calendar } from "~/components/ui/calendar";
 import { Text } from "~/_components/Text";
-// import { useGetAllPosts, useLikePost } from "~/APIs/hooks/usePost";
 import Spinner from "~/_components/Spinner";
 import {
   useCreateComment,
   useGetAllCommentsForPost,
 } from "~/APIs/hooks/useComments";
 import { isToday, isAfter } from "date-fns";
-import { CustomEvent } from "~/types";
+import { type CustomEvent } from "~/types";
 import { toast } from "react-toastify";
 import {
   useUpcomingEvents,
@@ -43,7 +41,7 @@ export default function Home() {
   const { mutate: addAttendance } = useAddAttendance({
     onSuccess: () => {
       toast.success("Attendance confirmed successfully!");
-      refetchEvents();
+      void refetchEvents();
     },
     onError: () => {
       toast.success("Error confirmed attendance!");
@@ -53,7 +51,7 @@ export default function Home() {
   const { mutate: removeAttendance } = useRemoveAttendance({
     onSuccess: () => {
       toast.success("Attendance removed successfully!");
-      refetchEvents();
+      void refetchEvents();
     },
     onError: () => {
       toast.success("Error remove attendance!");
@@ -100,7 +98,7 @@ export default function Home() {
     refetch: refetchComments,
     isLoading: isLoadingComments,
   } = useGetAllCommentsForPost({
-    postId: selectedPostId || 0,
+    postId: selectedPostId ?? 0,
     page: 0,
     size: 10,
   });
@@ -119,7 +117,7 @@ export default function Home() {
       { postId, liked },
       {
         onSuccess: () => {
-          refetch(); // Only refetch posts after successful like/unlike mutation
+          void refetch(); // Only refetch posts after successful like/unlike mutation
         },
       },
     );
@@ -136,7 +134,7 @@ export default function Home() {
         {
           onSuccess: () => {
             // Refetch the comments after the comment is added successfully
-            refetchComments();
+            void refetchComments();
             setComment(""); // Clear the input field after sending
           },
         },
@@ -150,12 +148,12 @@ export default function Home() {
 
   const handleConfirmAttendance = (eventId: string) => {
     addAttendance(eventId);
-    refetchEvents();
+    void refetchEvents();
   };
 
   const handleRemoveAttendance = (eventId: string) => {
     removeAttendance(eventId);
-    refetchEvents();
+    void refetchEvents();
   };
 
   if (isLoading || isEventsLoading)
