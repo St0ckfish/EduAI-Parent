@@ -339,6 +339,7 @@ export type Post = {
   isLiked: boolean;
   isEdited: boolean;
   likesCount: number;
+  commentsCount: number;
   attachmentsCount: number;
   attachments: Attachment[];
 };
@@ -436,17 +437,6 @@ export type TeacherProfile = {
 };
 
 export type TeacherProfileUpdate = {
-  // username: string;
-  // email: string;
-  // name_en: string;
-  // name_fr: string;
-  // name_ar: string;
-  // number?: string;
-  // phoneNumber?: string;
-  // gender: "MALE" | "FEMALE";
-  // nationality: string;
-  // qualification?: string;
-  // subjects: string[];
   name_en: string;
   name_ar: string;
   name_fr: string;

@@ -44,7 +44,7 @@ export default function Home() {
       void refetchEvents();
     },
     onError: () => {
-      toast.success("Error confirmed attendance!");
+      toast.error("Error confirmed attendance!");
     },
   });
 
@@ -254,16 +254,14 @@ export default function Home() {
                       />
                     )}
 
-                    <span className="text-sm">{post?.likesCount}</span>
+                    <Text size={"xs"}>{post?.likesCount}</Text>
                   </button>
                   <button
                     className="flex items-center gap-1"
                     onClick={() => handleCommentClick(post.id)}
                   >
                     <FaRegComment size={20} />
-                    <span className="text-sm">
-                      {comments?.data.content.length}
-                    </span>
+                    <Text size={"xs"}>{post?.commentsCount}</Text>
                   </button>
                   <FaPaperPlane size={20} />
                 </div>

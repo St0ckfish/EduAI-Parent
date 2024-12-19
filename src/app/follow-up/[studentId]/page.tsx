@@ -10,6 +10,7 @@ import {
   useGetDailyExamData,
 } from "~/APIs/hooks/useExam";
 import { useParams } from "next/navigation";
+import Spinner from "~/_components/Spinner";
 
 const DailyPlan = () => {
   const { studentId } = useParams();
@@ -18,17 +19,13 @@ const DailyPlan = () => {
   const [selectedGrade, setSelectedGrade] = useState<string>("");
 
   // Fetch API data
-  const { data: dataDailyExam } = useGetDailyExamData(
+  const { data: dataDailyExam, isLoading: isExamLoading } = useGetDailyExamData(
     studentId?.toString() ?? "",
   );
-  const { data: dataDailyExamAttempts } = useGetDailyExamAttempts(
-    studentId?.toString() ?? "",
-    examId,
-  );
-  const { data: dataAttemptAnswers } = useGetAttemptAnswers(
-    studentId?.toString() ?? "",
-    attemptId,
-  );
+  const { data: dataDailyExamAttempts, isLoading: isDailyExamAttempts } =
+    useGetDailyExamAttempts(studentId?.toString() ?? "", examId);
+  const { data: dataAttemptAnswers, isLoading: isAttemptAnswers } =
+    useGetAttemptAnswers(studentId?.toString() ?? "", attemptId);
 
   // Update states on data change
   useEffect(() => {
@@ -44,6 +41,16 @@ const DailyPlan = () => {
   const handleGradeChange = (gradeValue: string) => {
     setSelectedGrade(gradeValue);
   };
+
+  if (isExamLoading || isDailyExamAttempts || isAttemptAnswers) {
+    return (
+      <Container>
+        <div className="flex h-[75vh] items-center justify-center">
+          <Spinner />
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -120,7 +127,16 @@ const DailyPlan = () => {
 
                       return (
                         <li key={idx} className={`-ml-3 ${optionClass}`}>
-                          {idx == 0 ? "A" : idx == 1 ? "B" : idx == 2 ? "C" : idx == 3 ? "D" : ""})  {option}
+                          {idx == 0
+                            ? "A"
+                            : idx == 1
+                              ? "B"
+                              : idx == 2
+                                ? "C"
+                                : idx == 3
+                                  ? "D"
+                                  : ""}
+                          ) {option}
                         </li>
                       );
                     })}
