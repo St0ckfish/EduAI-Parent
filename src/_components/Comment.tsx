@@ -183,7 +183,6 @@ const Comment = ({
               )}
             </button>
           </div>
-          <div>reply</div>
         </div>
         {updateError && (
           <div className="text-red-500">Error updating comment</div>
