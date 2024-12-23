@@ -63,13 +63,13 @@ const Login = () => {
                       message: "Username must be at least 3 characters",
                     },
                   })}
-                  error={errors.username?.message?.toString() ?? ""}
+                  error={errors.username?.message as string ?? ""}
                   placeholder="Username"
                   theme="transparent"
                 />
                 {errors.username && (
                   <p className="mt-1 text-sm text-error">
-                    {errors.username.message?.toString()}
+                    {errors.username?.message as string}
                   </p>
                 )}
               </label>
@@ -89,7 +89,7 @@ const Login = () => {
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-error">
-                    {errors.password.message?.toString()}
+                    {errors.password?.message as string}
                   </p>
                 )}
               </label>
