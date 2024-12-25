@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import Image from "next/image";
 import Container from "~/_components/Container";
@@ -8,25 +9,31 @@ import {
   useGetProfileUpdate,
   useProfile,
   useUpdateProfile,
+  useUpdateProfilePicture,
 } from "~/APIs/hooks/useProfile";
 import { useGetAllNationalities } from "~/APIs/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type TeacherProfileUpdate } from "~/types";
 import Button from "~/_components/Button";
 import { useGetAllTextBookSummarys } from "~/APIs/hooks/useTextBook";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { MdEdit } from "react-icons/md";
 
 const EditProfile = () => {
   const router = useRouter();
   const { data, isLoading, refetch: refetchProfile } = useProfile();
-  const { data: dataUpdate, isLoading: isLoadingdataUpdate, refetch: refetchDataUpdate } =
-    useGetProfileUpdate();
-    console.log('dataUpdate', dataUpdate);
+  const {
+    data: dataUpdate,
+    isLoading: isLoadingdataUpdate,
+    refetch: refetchDataUpdate,
+  } = useGetProfileUpdate();
+  console.log("👾 ~ EditProfile ~ dataUpdate:", dataUpdate);
+  console.log("👾 ~ EditProfile ~ data:", data);
 
   const [name, setName] = useState(""); // Initialize state as empty
   const [phone, setPhone] = useState(""); // Initialize state as empty
-  console.log('phone', phone);
+  console.log("phone", phone);
   const [gender, setGender] = useState<"MALE" | "FEMALE">("MALE"); // Initialize state as empty
   const [nationality, setNationality] = useState(""); // Initialize state as empty
   const [qualification, setQualification] = useState(""); // Initialize state as empty
@@ -50,12 +57,23 @@ const EditProfile = () => {
     if (data?.data) {
       setName(data.data.name || "");
       setPhone(dataUpdate?.data.phone || "");
-      setGender(dataUpdate?.data.gender === "MALE" ? "MALE" : dataUpdate?.data.gender === "FEMALE" ? "FEMALE" : "MALE");
+      setGender(
+        dataUpdate?.data.gender === "MALE"
+          ? "MALE"
+          : dataUpdate?.data.gender === "FEMALE"
+            ? "FEMALE"
+            : "MALE",
+      );
       setNationality(dataUpdate?.data.nationality || "");
       setQualification(data.data.qualification || "");
       // setSubject(data.data.subjects[0] || "");
     }
-  }, [data]);
+  }, [
+    data,
+    dataUpdate?.data.gender,
+    dataUpdate?.data.nationality,
+    dataUpdate?.data.phone,
+  ]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -65,17 +83,16 @@ const EditProfile = () => {
     setPhone(e.target.value);
   };
 
-
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    e.target.value === "MALE"? setGender("MALE"): setGender("FEMALE");
+    e.target.value === "MALE" ? setGender("MALE") : setGender("FEMALE");
   };
 
-  const {data: dataSubjects} = useGetAllTextBookSummarys();
+  const { data: dataSubjects } = useGetAllTextBookSummarys();
   console.log(dataSubjects);
   const { mutate: updateProfileMutation } = useUpdateProfile({
     onSuccess: () => {
-      router.push('/'); // Navigate to home page on success
+      router.push("/"); // Navigate to home page on success
       toast.success("Profile Edited successfully!");
     },
   });
@@ -91,17 +108,64 @@ const EditProfile = () => {
       nationality: dataUpdate?.data?.nationality || "",
       birthDate: dataUpdate?.data?.birthDate || "",
       nid: dataUpdate?.data?.nid || "",
-      religion: dataUpdate?.data?.religion || "",       // enum  : /api/v1/public/enumeration/religion
+      religion: dataUpdate?.data?.religion || "", // enum  : /api/v1/public/enumeration/religion
       regionId: dataUpdate?.data?.regionId || "",
       about: dataUpdate?.data?.about || "",
       countryCode: "AU",
     };
-    console.log('updatedProfile', updatedProfile);
+    console.log("updatedProfile", updatedProfile);
     updateProfileMutation(updatedProfile);
     refetchDataUpdate();
     refetchProfile();
   };
 
+  // Profile Picture
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false); // For spinner
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const mutation = useUpdateProfilePicture({
+    onSuccess: () => {
+      toast.success("Profile picture updated successfully!");
+      setUploading(false); // Stop spinner
+      refetchDataUpdate();
+      refetchProfile();
+    },
+    onError: (error) => {
+      toast.error("Failed to update profile picture. Please try again.");
+      setUploading(false); // Stop spinner
+    },
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      // Validate file type and size
+      const validTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        toast.error(
+          "Invalid file type. Please upload a JPG, PNG, or WEBP image.",
+        );
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
+        toast.error("File size exceeds 5MB. Please upload a smaller image.");
+        return;
+      }
+
+      setPreview(URL.createObjectURL(file)); // Preview the selected image
+      setUploading(true); // Show spinner while uploading
+      mutation.mutate(file); // Upload the picture
+    }
+  };
+
+  const handleEditClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   if (isLoading || isNationalities || isLoadingdataUpdate) {
     return <Spinner />;
@@ -115,17 +179,41 @@ const EditProfile = () => {
             Edit Profile
           </Text>
           <div className="mt-4 flex flex-col items-center">
-            <div>
-              <Image
-                priority
-                unoptimized
-                src={dataUpdate?.data?.picture || "/images/userr.png"}
+            <div className="relative">
+              <img
+                src={preview ?? data?.data?.picture ?? "/images/userr.png"}
                 alt="Profile Photo"
                 width={100}
                 height={100}
-                className="rounded-full"
+                className="inline-block h-24 w-24 rounded-full ring-2 ring-bgSecondary"
+              />
+
+              {/* Edit Button */}
+              <div className="relative">
+                <button
+                  onClick={handleEditClick}
+                  className="absolute mx-auto my-auto -top-4 -right-4 flex h-8 w-8 items-center justify-center rounded-full bg-primary p-2 text-white shadow-lg"
+                  aria-label="Edit Profile Picture"
+                  style={{ transform: "translate(-50%, -50%)" }}
+                >
+                  {uploading ? (
+                    <Spinner size={20} /> // Show spinner while uploading
+                  ) : (
+                    <MdEdit />
+                  )}
+                </button>
+              </div>
+
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileChange}
               />
             </div>
+
             <div className="flex flex-col items-center">
               <Text font={"bold"} size={"2xl"} className="mt-2">
                 {data?.data?.name}
