@@ -205,7 +205,7 @@ const paymentMethods = [
           Choose payment method
         </Text>
         <RadioGroup.Root
-          className="my-4 flex space-x-4"
+          className="my-4 flex flex-col lg:flex-row space-y-4 lg:space-x-4 lg:space-y-0"
           value={selectedPayment} // Bind the value to the state
           onValueChange={handlePaymentChange} // Update the state when a new option is selected
         >
@@ -213,7 +213,7 @@ const paymentMethods = [
             <RadioGroup.Item
               key={value}
               value={value}
-              className="group flex h-20 w-1/4 flex-col justify-center rounded-lg border-2 border-borderPrimary text-center text-textSecondary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:text-primary"
+              className="group flex h-20 w-full lg:w-1/4 flex-col justify-center rounded-lg border-2 border-borderPrimary text-center text-textSecondary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:text-primary"
               id={value}
             >
               <div className="flex w-full justify-between px-4">
@@ -330,7 +330,7 @@ const paymentMethods = [
               The amount required to pay for the bus subscription is 400 MAD
             </Text>
             <RadioGroup.Root
-              className="my-4 flex space-x-4"
+              className="my-4 flex flex-col lg:flex-row space-y-4 lg:space-x-4 lg:space-y-0"
               value={selectedVisa} // Bind the value to the state
               onValueChange={handleVisaChange} // Update the state when a new option is selected
             >
@@ -338,7 +338,7 @@ const paymentMethods = [
                 <RadioGroup.Item
                   key={visaNumber}
                   value={visaNumber}
-                  className="group flex h-20 w-1/4 flex-col justify-center rounded-lg border-2 border-borderPrimary text-center text-textSecondary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:text-primary"
+                  className="group flex h-20 w-full lg:w-1/4 flex-col justify-center rounded-lg border-2 border-borderPrimary text-center text-textSecondary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:text-primary"
                   id={visaNumber}
                 >
                   <div className="flex w-full justify-between px-4">
@@ -399,7 +399,7 @@ const paymentMethods = [
                 The amount required to pay for the bus subscription is 400 MAD
               </Text>
               <RadioGroup.Root
-                className="my-4 flex space-x-4"
+                className="my-4 flex flex-col lg:flex-row space-y-4 lg:space-x-4 lg:space-y-0"
                 value={selectedVisa} // Bind the value to the state
                 onValueChange={handleVisaChange} // Update the state when a new option is selected
               >
@@ -407,7 +407,7 @@ const paymentMethods = [
                   <RadioGroup.Item
                     key={name}
                     value={name}
-                    className="group flex h-20 w-1/4 flex-col justify-center rounded-lg border-2 border-borderPrimary text-center text-textSecondary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:text-primary"
+                    className="group flex h-20 w-full lg:w-1/4 flex-col justify-center rounded-lg border-2 border-borderPrimary text-center text-textSecondary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:text-primary"
                     id={name}
                   >
                     <div className="flex w-full justify-between px-4">
@@ -426,7 +426,7 @@ const paymentMethods = [
                   </RadioGroup.Item>
                 ))}
               </RadioGroup.Root>
-              <form className="mt-8 grid w-2/3 grid-cols-1 gap-8 md:grid-cols-2">
+              <form className="mt-8 grid w-2/3 grid-cols-1 gap-8 lg:grid-cols-2">
                 <div>
                   <label htmlFor="phoneNumber" className="text-xl">
                     Phone Number
@@ -476,7 +476,7 @@ const paymentMethods = [
               Visit the nearest CIB branch and make a deposit using the
               following details, then confirm the transfer on the Edu AI app.
             </Text>
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 grid w-2/3 grid-cols-1 gap-8 md:grid-cols-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 grid w-2/3 grid-cols-1 gap-8 lg:grid-cols-2">
               <div>
               <label htmlFor="bankAccountId" className="block">
                 Bank Id 

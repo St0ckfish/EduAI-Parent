@@ -141,7 +141,7 @@ const FollowUp = () => {
 
   return (
     <Container>
-      <div className="mb-8 flex justify-between">
+      <div className="mb-8 flex gap-4 justify-between">
         <div>
           <Controller
             name="schoolId"
@@ -293,8 +293,8 @@ const FollowUp = () => {
           <Text font={"bold"} size={"xl"}>
             Grade Book
           </Text>
-          <div className="flex w-full justify-start gap-8 rounded-xl bg-bgPrimary p-8">
-            <div className="w-1/5">
+          <div className="flex w-full flex-col lg:flex-row justify-center md:justify-start items-center md:items-start gap-8 rounded-xl bg-bgPrimary p-8">
+            <div className="w-full lg:w-1/5">
               <RadioGroup.Root
                 className="gap-4"
                 value={selectedGrade}
@@ -305,7 +305,7 @@ const FollowUp = () => {
                   <RadioGroup.Item
                     key={value}
                     value={value}
-                    className="group mt-1 flex h-20 w-full flex-col justify-center rounded-l-2xl bg-lightGray px-4 text-center text-textPrimary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                    className="group mt-1 flex h-20 w-full flex-col justify-center rounded-l-2xl rounded-r-2xl lg:rounded-r-none bg-lightGray px-4 text-center text-textPrimary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:bg-primary"
                     aria-labelledby={`${value}-label`}
                   >
                     <span
@@ -319,11 +319,11 @@ const FollowUp = () => {
               </RadioGroup.Root>
             </div>
 
-            <div className="w-4/5">
+            <div className="w-full lg:w-1/5">
               {/* Display the selected subject's assignments */}
               {selectedSubject && (
                 <>
-                  <table className="w-full table-fixed rounded-2xl">
+                  <table className="w-full border-separate border-spacing-y-2 rounded-2xl">
                     <thead>
                       <tr className="text-textSecondary">
                         <th className="px-4 py-2 text-left">Assignment</th>
@@ -360,7 +360,7 @@ const FollowUp = () => {
                     <Text font={"semiBold"}>Weighted Average Score: </Text>
                     <Text color={"gray"}>{selectedSubject.score}</Text>
                   </div>
-                  <table className="mt-4 w-full table-fixed rounded-2xl">
+                  <table className="mt-4 w-full border-separate border-spacing-y-2 rounded-2xl">
                     <thead>
                       <tr className="text-textSecondary">
                         <th className="px-4 py-2 text-left">

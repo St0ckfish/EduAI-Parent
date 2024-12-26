@@ -58,9 +58,9 @@ const DailyPlan = () => {
         <Text font={"bold"} size={"2xl"}>
           Daily Plan
         </Text>
-        <div className="flex w-full justify-start gap-8 rounded-xl bg-bgPrimary p-8">
+        <div className="flex w-full flex-col items-center justify-center gap-8 rounded-xl bg-bgPrimary p-8 md:items-start md:justify-start lg:flex-row">
           {/* Radio Group for Grade Selection */}
-          <div className="w-1/4">
+          <div className="w-full md:w-1/4">
             <RadioGroup.Root
               className="gap-4"
               value={selectedGrade}
@@ -78,7 +78,7 @@ const DailyPlan = () => {
                   <RadioGroup.Item
                     key={id}
                     value={courseName}
-                    className="group relative mt-1 flex h-20 w-full flex-col justify-center rounded-l-2xl bg-lightGray px-4 text-center text-textPrimary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                    className="group mt-1 flex h-20 w-full flex-col justify-center rounded-l-2xl rounded-r-2xl bg-lightGray px-4 text-center text-textPrimary transition hover:border-primary hover:text-primary focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-opacity-75 data-[state=checked]:border-primary data-[state=checked]:bg-primary lg:rounded-r-none"
                     aria-labelledby={`${id}-label`}
                   >
                     <div className="flex w-full justify-between">
@@ -104,7 +104,7 @@ const DailyPlan = () => {
           </div>
 
           {/* Questions Display */}
-          <div className="w-3/4">
+          <div className="w-full md:w-3/4">
             {dataAttemptAnswers?.data && dataAttemptAnswers.data.length > 0 ? (
               dataAttemptAnswers.data.map((question, index) => (
                 <div key={index} className="mb-6 ml-10">

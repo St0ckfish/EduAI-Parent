@@ -137,7 +137,7 @@ const Complaint = () => {
   return (
     <>
       <Container>
-        <div className="m-4 mb-4 flex flex-col items-start justify-between gap-4 md:flex-row">
+        <div className="m-4 mb-4 flex flex-col-reverse  items-start justify-between gap-4 md:flex-row">
           <div className="flex w-full flex-col gap-4 rounded-xl bg-bgPrimary p-4">
             <Text font={"bold"} size={"4xl"}>
               Complaint

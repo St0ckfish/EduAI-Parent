@@ -224,7 +224,7 @@ const EditProfile = () => {
             </div>
           </div>
           <div className="m-auto w-4/5">
-            <div className="flex gap-8">
+            <div className="flex flex-col md:flex-row gap-8">
               <div>
                 <a href="/profile" className="text-xl text-primary underline">
                   Personal Info.
