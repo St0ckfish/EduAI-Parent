@@ -31,8 +31,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <title>EduAI Parent</title>
-        <meta name="description" content="Edu AI-Parent" />
+        <title>Welcome to EduAI Parent Portal</title>
+        <meta name="description" content="Stay updated on your child's academic progress, attendance, and school activities. Connect with teachers and get important updates to support your child's learning journey." />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       </head>
       <body className="bg-bgSecondary">

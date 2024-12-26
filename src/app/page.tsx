@@ -390,7 +390,7 @@ export default function Home() {
                 </div>
               ))
             ) : (
-              <Text>No events scheduled for today.</Text>
+              <Text color="gray" font={"semiBold"} size={"lg"} className="m-2">No events scheduled for today.</Text>
             )}
           </div>
 
@@ -455,7 +455,7 @@ export default function Home() {
                 </div>
               ))
             ) : (
-              <Text>No upcoming events scheduled.</Text>
+              <Text color="gray" font={"semiBold"} size={"lg"} className="m-2">No upcoming events scheduled.</Text>
             )}
           </div>
         </div>

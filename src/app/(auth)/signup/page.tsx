@@ -100,18 +100,18 @@ const Signup = () => {
 
   const countryOptions = countryData?.data
     ? Object.entries(countryData.data).map(
-      ([key, value]: [string, string]) => ({
-        value: key,
-        label: `+${key} (${value})`,
-      }),
-    )
+        ([key, value]: [string, string]) => ({
+          value: key,
+          label: `+${key} (${value})`,
+        }),
+      )
     : [];
 
   const optionsNationalities = nationalityData?.data
     ? Object.entries(nationalityData.data).map(([key, value]) => ({
-      value: key,
-      label: `${value}`,
-    }))
+        value: key,
+        label: `${value}`,
+      }))
     : [];
 
   const { mutate, isPending: isSubmitting } = useSignUp();
@@ -158,27 +158,48 @@ const Signup = () => {
         department: "SCIENTIFIC",
         studyLevel: "GRADE11",
         subDepartment: "MATHEMATICAL_SCIENCES",
-      }
+      },
     };
 
-    formData.append('request', JSON.stringify(depositRequest));
-    if (data.parentIdPhoto && data.parentIdPhoto instanceof FileList && data.parentIdPhoto.length > 0) {
-      formData.append('parentIdPhoto', data.parentIdPhoto[0]!);
+    formData.append("request", JSON.stringify(depositRequest));
+    if (
+      data.parentIdPhoto &&
+      data.parentIdPhoto instanceof FileList &&
+      data.parentIdPhoto.length > 0
+    ) {
+      formData.append("parentIdPhoto", data.parentIdPhoto[0]!);
     }
-    if (data.studentCertificatesOfAchievement && data.studentCertificatesOfAchievement instanceof FileList && data.studentCertificatesOfAchievement.length > 0) {
-      formData.append('studentCertificatesOfAchievement', data.studentCertificatesOfAchievement[0]!);
+    if (
+      data.studentCertificatesOfAchievement &&
+      data.studentCertificatesOfAchievement instanceof FileList &&
+      data.studentCertificatesOfAchievement.length > 0
+    ) {
+      formData.append(
+        "studentCertificatesOfAchievement",
+        data.studentCertificatesOfAchievement[0]!,
+      );
     }
-    if (data.studentIdPhoto && data.studentIdPhoto instanceof FileList && data.studentIdPhoto.length > 0) {
-      formData.append('studentIdPhoto', data.studentIdPhoto[0]!);
+    if (
+      data.studentIdPhoto &&
+      data.studentIdPhoto instanceof FileList &&
+      data.studentIdPhoto.length > 0
+    ) {
+      formData.append("studentIdPhoto", data.studentIdPhoto[0]!);
     }
-    if (data.studentProfilePhoto && data.studentProfilePhoto instanceof FileList && data.studentProfilePhoto.length > 0) {
-      formData.append('studentProfilePhoto', data.studentProfilePhoto[0]!);
+    if (
+      data.studentProfilePhoto &&
+      data.studentProfilePhoto instanceof FileList &&
+      data.studentProfilePhoto.length > 0
+    ) {
+      formData.append("studentProfilePhoto", data.studentProfilePhoto[0]!);
     }
     mutate(formData as unknown as Partial<SignUpFormData>, {
       onSuccess: () => {
         toast.success("Form submitted successfully!");
       },
-      onError: (err: Error & { response?: { data: { message: string; data: [] } } }) => {
+      onError: (
+        err: Error & { response?: { data: { message: string; data: [] } } },
+      ) => {
         if (err.response?.data) {
           toast.error(err.response.data.message);
           setErrorMessage(err.response.data.data);
@@ -191,7 +212,7 @@ const Signup = () => {
 
   // Function to trigger validation for the current step
   const triggerValidation = async () => {
-    let fieldsToValidate: (keyof SignUpFormData['request'])[] = [];
+    let fieldsToValidate: (keyof SignUpFormData["request"])[] = [];
     switch (step) {
       case 1:
         fieldsToValidate = ["username", "email", "schoolId", "regionId"];
@@ -218,7 +239,9 @@ const Signup = () => {
         break;
     }
 
-    const mappedFieldsToValidate = fieldsToValidate.map(field => `request.${field}` as const);
+    const mappedFieldsToValidate = fieldsToValidate.map(
+      (field) => `request.${field}` as const,
+    );
 
     const result = await trigger(mappedFieldsToValidate);
     return result;
@@ -251,23 +274,25 @@ const Signup = () => {
         </Text>
 
         {/* Steps */}
-        <div className="mb-20 flex w-full items-center justify-center">
-          <div className="flex items-center">
+        <div className="mb-20 p-4 flex w-full flex-col items-center justify-center sm:flex-row">
+          <div className="flex flex-wrap items-center justify-center md:flex-nowrap">
             {[1, 2, 3, 4, 5, 6, 7].map((stepIndex, index) => (
               <React.Fragment key={stepIndex}>
                 <div
-                  className={`relative flex h-8 w-8 items-center justify-center rounded-full ${index < step ? "bg-primary" : "bg-gray-300"
-                    } font-bold text-white`}
+                  className={`relative mb-10 flex h-6 w-6 items-center justify-center rounded-full ${
+                    index < step ? "bg-primary" : "bg-gray-300"
+                  } text-xs font-bold text-white sm:h-8 sm:w-8 sm:text-sm`}
                 >
                   {stepIndex}
-                  <Text className="absolute -left-[15px] top-10 w-[100px] text-[10px] text-textPrimary sm:left-[-22px] sm:w-[120px] sm:text-xs">
+                  <Text className="absolute -left-[15px] top-8 w-[80px] text-[8px] text-textPrimary sm:-left-[22px] sm:top-10 sm:w-[100px] sm:text-xs">
                     {stepsDescription[index]}
                   </Text>
                 </div>
                 {index < 6 && (
                   <hr
-                    className={`h-[5px] w-20 ${index < step - 1 ? "bg-primary" : "bg-gray-300"
-                      } sm:w-[105px]`}
+                    className={`h-[5px] mb-10 w-16 ${
+                      index < step - 1 ? "bg-primary" : "bg-gray-300"
+                    } sm:h-[5px] sm:w-[105px]`}
                   />
                 )}
               </React.Fragment>
@@ -326,7 +351,9 @@ const Signup = () => {
                   defaultValue="" // Initialize with a default value
                   render={({ field: { onChange, value } }) => (
                     <SearchableSelect
-                      error={errors.request?.schoolId?.message?.toString() ?? ""}
+                      error={
+                        errors.request?.schoolId?.message?.toString() ?? ""
+                      }
                       value={value}
                       onChange={onChange}
                       placeholder="Select School"
@@ -343,7 +370,9 @@ const Signup = () => {
                   defaultValue="" // Initialize with a default value
                   render={({ field: { onChange, value } }) => (
                     <SearchableSelect
-                      error={errors.request?.regionId?.message?.toString() ?? ""}
+                      error={
+                        errors.request?.regionId?.message?.toString() ?? ""
+                      }
                       value={value}
                       onChange={onChange}
                       placeholder="Select Region"
@@ -429,7 +458,9 @@ const Signup = () => {
             <>
               <label htmlFor="occupation_en" className="block">
                 <Input
-                  error={errors.request?.occupation_en?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.occupation_en?.message?.toString() ?? ""
+                  }
                   {...register("request.occupation_en", {
                     required: "English Occupation is required",
                   })}
@@ -444,7 +475,9 @@ const Signup = () => {
               </label>
               <label htmlFor="occupation_fr" className="block">
                 <Input
-                  error={errors.request?.occupation_fr?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.occupation_fr?.message?.toString() ?? ""
+                  }
                   {...register("request.occupation_fr", {
                     required: "French Occupation is required",
                   })}
@@ -459,7 +492,9 @@ const Signup = () => {
               </label>
               <label htmlFor="occupation_ar" className="block">
                 <Input
-                  error={errors.request?.occupation_ar?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.occupation_ar?.message?.toString() ?? ""
+                  }
                   {...register("request.occupation_ar", {
                     required: "Arabic Occupation is required",
                   })}
@@ -489,7 +524,6 @@ const Signup = () => {
           )}
           {step === 4 && (
             <>
-
               <label htmlFor="password" className="block">
                 <Input
                   error={errors.request?.password?.message?.toString() ?? ""}
@@ -518,7 +552,9 @@ const Signup = () => {
                   defaultValue="" // Initialize with a default value
                   render={({ field: { onChange, value } }) => (
                     <SearchableSelect
-                      error={errors.request?.nationality?.message?.toString() ?? ""}
+                      error={
+                        errors.request?.nationality?.message?.toString() ?? ""
+                      }
                       value={value}
                       onChange={onChange}
                       placeholder="Select Nationality"
@@ -553,7 +589,6 @@ const Signup = () => {
           )}
           {step === 5 && (
             <>
-
               <label htmlFor="gender" className="block">
                 <Controller
                   name="request.gender"
@@ -647,7 +682,9 @@ const Signup = () => {
                     defaultValue="" // Initialize with a default value
                     render={({ field: { onChange, value } }) => (
                       <SearchableSelect
-                        error={errors.request?.countryCode?.message?.toString() ?? ""}
+                        error={
+                          errors.request?.countryCode?.message?.toString() ?? ""
+                        }
                         value={value}
                         onChange={onChange}
                         placeholder="Country"
@@ -710,7 +747,9 @@ const Signup = () => {
           )}
           {step === 6 && (
             <>
-              <Text font="medium" className="mb-10">Student Data</Text>
+              <Text font="medium" className="mb-10">
+                Student Data
+              </Text>
               <label htmlFor="username" className="">
                 <Input
                   {...register("request.student.username", {
@@ -720,7 +759,9 @@ const Signup = () => {
                       message: "Username must be at least 3 characters",
                     },
                   })}
-                  error={errors.request?.student?.username?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.student?.username?.message?.toString() ?? ""
+                  }
                   placeholder="Username"
                   theme="transparent"
                 />
@@ -732,7 +773,9 @@ const Signup = () => {
               </label>
               <label htmlFor="email" className="block">
                 <Input
-                  error={errors.request?.student?.email?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.student?.email?.message?.toString() ?? ""
+                  }
                   {...register("request.student.email", {
                     required: "Email is required",
                     pattern: {
@@ -751,7 +794,9 @@ const Signup = () => {
               </label>
               <label htmlFor="name_en" className="block">
                 <Input
-                  error={errors.request?.student?.name_en?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.student?.name_en?.message?.toString() ?? ""
+                  }
                   {...register("request.student.name_en", {
                     required: "English name is required",
                   })}
@@ -766,7 +811,9 @@ const Signup = () => {
               </label>
               <label htmlFor="name_fr" className="block">
                 <Input
-                  error={errors.request?.student?.name_fr?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.student?.name_fr?.message?.toString() ?? ""
+                  }
                   {...register("request.student.name_fr", {
                     required: "French name is required",
                   })}
@@ -781,7 +828,9 @@ const Signup = () => {
               </label>
               <label htmlFor="name_ar" className="block">
                 <Input
-                  error={errors.request?.student?.name_ar?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.student?.name_ar?.message?.toString() ?? ""
+                  }
                   {...register("request.student.name_ar", {
                     required: "Arabic name is required",
                   })}
@@ -822,7 +871,9 @@ const Signup = () => {
               </label>
               <label htmlFor="password" className="block">
                 <Input
-                  error={errors.request?.student?.password?.message?.toString() ?? ""}
+                  error={
+                    errors.request?.student?.password?.message?.toString() ?? ""
+                  }
                   {...register("request.student.password", {
                     required: "Password is required",
                     minLength: {
@@ -857,7 +908,6 @@ const Signup = () => {
           )}
           {step === 7 && (
             <>
-
               <label htmlFor="nid" className="block">
                 <Input
                   {...register("request.student.nid", {
@@ -986,7 +1036,6 @@ const Signup = () => {
                   </p>
                 )}
               </label>
-
 
               <div className="mt-8 flex justify-center space-x-4">
                 <Button type="button" onClick={prevStep} theme="outline">

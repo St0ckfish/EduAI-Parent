@@ -38,7 +38,7 @@ const Exam = () => {
         <Text font="bold" size="2xl" className="mb-4">
           {type} Exams
         </Text>
-        <table className="w-full overflow-x-auto p-4 text-left text-sm text-textPrimary">
+        <table className="w-full border-separate border-spacing-y-2 overflow-x-auto p-4 text-left text-sm text-textPrimary">
           <thead className="text-xs uppercase text-textPrimary">
             <tr>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
@@ -110,16 +110,19 @@ const Exam = () => {
   }
 
   return (
-    <Container>
-      <div className="flex w-full items-center justify-between gap-7">
-        <div className="flex w-[400px] items-center gap-10">
+   <div> 
+     <Container>
+      <div className="flex w-full items-start md:items-center justify-between gap-7">
+        <div className="flex w-1/2 md:w-[400px] flex-col md:flex-row items-center gap-10">
           <Button
+            className="text-sm md:text-md"
             theme={viewMode === "previous" ? "solid" : "outline"}
             onClick={() => setViewMode("previous")}
           >
             Previous Exams
           </Button>
           <Button
+            className="text-sm md:text-md"
             theme={viewMode === "upcoming" ? "solid" : "outline"}
             onClick={() => setViewMode("upcoming")}
           >
@@ -127,9 +130,9 @@ const Exam = () => {
           </Button>
         </div>
 
-        <div className="flex w-[300px]">
+        <div className="flex w-1/2 md:w-[300px]">
           <select
-            className="flex w-full items-center gap-3 whitespace-nowrap rounded-xl bg-bgPrimary px-6 py-4 font-semibold outline-none duration-200 ease-in hover:shadow-lg"
+            className="flex w-full text-sm md:text-md items-center gap-3 whitespace-nowrap rounded-xl bg-bgPrimary px-6 py-4 font-semibold outline-none duration-200 ease-in hover:shadow-lg"
             onChange={handleSelectExam}
           >
             <option value="">Select Student</option>
@@ -156,6 +159,7 @@ const Exam = () => {
         </div>
       </div>
     </Container>
+   </div>
   );
 };
 

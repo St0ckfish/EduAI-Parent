@@ -74,11 +74,11 @@ const Schedule = () => {
   return (
     <Container>
       <div className="mb-4 flex w-full gap-10 max-[1080px]:grid">
-        <div className="flex">
+        <div className="flex overflow-auto md:overflow-visible">
           <CalendarDemo onDateSelect={handleDateSelect} />
         </div>
 
-        <Box>
+        <Box className="overflow-auto">
           <div className="flex justify-between">
             <Text font={"semiBold"} size={"xl"} className="mb-3">
               Today Classes
@@ -146,13 +146,6 @@ const Schedule = () => {
                 </td>
                 <td className="whitespace-nowrap rounded-e-2xl px-6 py-4">9</td>
               </tr>
-              {/* {(!data?.data || data.data.length === 0) && (
-                   <tr>
-                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                      No sessions scheduled for this date
-                    </td>
-                  </tr> 
-                )} */}
             </tbody>
           </table>
           <div className="flex justify-center gap-1 text-primary">
@@ -163,8 +156,8 @@ const Schedule = () => {
           </div>
         </Box>
       </div>
-      <div className="flex gap-8">
-        <div className="w-1/3 rounded-xl bg-bgPrimary p-4 shadow h-fit">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="w-full lg:w-2/5 xl:w-1/3 rounded-xl bg-bgPrimary p-4 shadow h-fit">
           <Text font={"bold"} size={"xl"}>
             Today&apos;s Attendance
           </Text>
