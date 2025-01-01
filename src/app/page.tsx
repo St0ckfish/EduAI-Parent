@@ -273,8 +273,7 @@ export default function Home() {
                   <div className="my-4 ml-4">
                     {isLoadingComments ? (
                       <div className="flex justify-center py-4">
-                        {/* <Spinner /> */}
-                        loading
+                        <Spinner />
                       </div>
                     ) : (
                       <>
