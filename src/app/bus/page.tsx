@@ -1,15 +1,20 @@
 "use client"
 import React, { useState, useEffect, useCallback } from 'react';
 import { Client, type Frame, type Message } from '@stomp/stompjs';
+import { MapContainer, TileLayer, Popup, useMapEvents, Marker } from 'react-leaflet';
+import { MapPin, Bus as BusIcon } from 'lucide-react';
+import { divIcon } from 'leaflet';
+import { renderToString } from 'react-dom/server';
 import Cookies from 'js-cookie';
 import { baseUrlStock } from '~/APIs/axios';
 import { useUserDataStore } from '~/APIs/store';
 import Container from '~/_components/Container';
+import 'leaflet/dist/leaflet.css';
 
 interface FormData {
   busId: string;
-  longitude: string;
-  latitude: string;
+  longitude: number;
+  latitude: number;
 }
 
 interface BusLocation {
@@ -36,28 +41,79 @@ interface Subscription {
   unsubscribe: () => void;
 }
 
+// Custom marker using Lucide icon
+const createCustomMarkerIcon = (color: string) => {
+  const iconHtml = renderToString(
+    <div className="relative">
+      <MapPin size={32} color={color} fill={color} fillOpacity={0.2} />
+      <div className="absolute bottom-0 left-1/2 w-px h-px bg-transparent" />
+    </div>
+  );
+
+  return divIcon({
+    html: iconHtml,
+    className: 'custom-marker',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+};
+
+// Custom map marker component
+const LocationMarker: React.FC<{
+  onLocationSelect: (lat: number, lng: number) => void;
+  position: [number, number] | null;
+}> = ({ onLocationSelect, position }) => {
+  const map = useMapEvents({
+    click(e) {
+      onLocationSelect(e.latlng.lat, e.latlng.lng);
+    },
+  });
+
+  return position ? (
+    <Marker
+      position={position}
+      icon={createCustomMarkerIcon('#e84743')} // Using blue color for marker
+    >
+      <Popup>Selected Location</Popup>
+    </Marker>
+  ) : null;
+};
+
 const Bus: React.FC = () => {
   const [connected, setConnected] = useState<boolean>(false);
   const [messages, setMessages] = useState<BusLocation[]>([]);
   const [formData, setFormData] = useState<FormData>({
     busId: '',
-    longitude: '',
-    latitude: ''
+    longitude: 0,
+    latitude: 0
   });
   const [stompClient, setStompClient] = useState<Client | null>(null);
   const [currentSubscription, setCurrentSubscription] = useState<Subscription | null>(null);
+  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
   
   const token = Cookies.get('token');
   const userData = useUserDataStore.getState().userData;
   const userId = userData.id;
 
+  // Map default position (center of the map)
+  const defaultPosition: [number, number] = [29.261243, -9.873053];
+
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setMarkerPosition([lat, lng]);
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng
+    }));
+  };
+
+  // Rest of the WebSocket logic remains the same
   const subscribeToBusLocation = useCallback((client: Client, busId: string) => {
-    // Unsubscribe from previous subscription if exists
     if (currentSubscription) {
       currentSubscription.unsubscribe();
     }
 
-    // Create new subscription
     const subscription = client.subscribe(`/topic/bus-location/${busId}`, (message: Message) => {
       const rawData: RawBusData = JSON.parse(message.body);
       const data: BusLocation = {
@@ -69,8 +125,9 @@ const Bus: React.FC = () => {
     });
 
     setCurrentSubscription(subscription);
-  }, []);
+  }, [currentSubscription]);
 
+  // WebSocket connection setup
   useEffect(() => {
     const client = new Client({
       brokerURL: `${baseUrlStock}ws?token=${token}`,
@@ -87,13 +144,11 @@ const Bus: React.FC = () => {
       console.log('Connected: ' + JSON.stringify(frame));
 
       try {
-        // Subscribe to notifications
         client.subscribe(`/user/${userId}/notifications`, (message: Message) => {
           const rawData: NotificationData = JSON.parse(message.body);
           showNotification(rawData);
         });
 
-        // Initially subscribe to bus location if busId is available
         if (formData.busId) {
           subscribeToBusLocation(client, formData.busId);
         }
@@ -118,17 +173,10 @@ const Bus: React.FC = () => {
         currentSubscription.unsubscribe();
       }
       if (client) {
-        client.deactivate();
+        void client.deactivate();
       }
     };
-  }, [userId, token, subscribeToBusLocation]);
-
-  // Handle bus ID changes
-  useEffect(() => {
-    if (connected && stompClient && formData.busId) {
-      subscribeToBusLocation(stompClient, formData.busId);
-    }
-  }, [connected, stompClient, formData.busId, subscribeToBusLocation]);
+  }, [userId, token, subscribeToBusLocation, formData.busId, currentSubscription]);
 
   const connect = useCallback(() => {
     if (stompClient) {
@@ -142,11 +190,11 @@ const Bus: React.FC = () => {
         currentSubscription.unsubscribe();
         setCurrentSubscription(null);
       }
-      stompClient.deactivate();
+      void stompClient.deactivate();
       setConnected(false);
       setMessages([]);
     }
-  }, [stompClient]);
+  }, [stompClient, currentSubscription]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -158,14 +206,14 @@ const Bus: React.FC = () => {
 
   const sendData = useCallback(() => {
     if (!formData.busId || !formData.longitude || !formData.latitude) {
-      alert("Please fill all fields!");
+      alert("Please fill all fields and select a location on the map!");
       return;
     }
 
     const data: BusLocation = {
       busId: parseInt(formData.busId),
-      longitude: parseFloat(formData.longitude),
-      latitude: parseFloat(formData.latitude),
+      longitude: formData.longitude,
+      latitude: formData.latitude,
     };
 
     try {
@@ -178,12 +226,6 @@ const Bus: React.FC = () => {
         body: JSON.stringify(data),
       });
       console.log("Data sent successfully:", data);
-      // Don't reset busId after sending to maintain subscription
-      setFormData(prev => ({
-        ...prev,
-        longitude: '',
-        latitude: ''
-      }));
     } catch (error) {
       console.error("Error during data sending:", error);
     }
@@ -197,14 +239,14 @@ const Bus: React.FC = () => {
     if (Notification.permission === "granted") {
       new Notification("Bus Location Update", {
         body: `Bus ID: ${data.id} - ${data.title}: ${data.description}`,
-        icon: "https://via.placeholder.com/48"
+        icon: "/bus-icon.png"
       });
     }
   };
 
   useEffect(() => {
     if (Notification.permission === "default") {
-      Notification.requestPermission().then(permission => {
+      void Notification.requestPermission().then(permission => {
         console.log("Notification permission: ", permission);
       });
     }
@@ -212,70 +254,109 @@ const Bus: React.FC = () => {
 
   return (
     <Container>
-      <div className="p-4">
-        <h1 className="text-2xl mb-4">WebSocket Local Test</h1>
-        
-        <div className="mb-4">
-          <button
-            className={`mr-2 px-4 py-2 rounded ${connected ? 'bg-gray-300' : 'bg-blue-500 text-white'}`}
-            onClick={connect}
-            disabled={connected}
-          >
-            Connect
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${!connected ? 'bg-gray-300' : 'bg-red-500 text-white'}`}
-            onClick={disconnect}
-            disabled={!connected}
-          >
-            Disconnect
-          </button>
-        </div>
-
-        {connected && (
-          <div className="mb-4">
-            <h2 className="text-xl mb-2">Messages</h2>
-            <div className="border rounded p-2">
-              {messages.map((msg, index) => (
-                <div key={index} className="mb-1">
-                  ID: {msg.busId}, Longitude: {msg.longitude}, Latitude: {msg.latitude}
-                </div>
-              ))}
-            </div>
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <BusIcon className="w-8 h-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-800">Bus Location Tracker</h1>
           </div>
-        )}
+          
+          <div className="mb-6 space-x-4">
+            <button
+              className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                connected 
+                  ? 'bg-gray-200 cursor-not-allowed' 
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+              onClick={connect}
+              disabled={connected}
+            >
+              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-gray-400' : 'bg-green-400'}`} />
+              Connect
+            </button>
+            <button
+              className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                !connected 
+                  ? 'bg-gray-200 cursor-not-allowed' 
+                  : 'bg-red-500 hover:bg-red-600 text-white'
+              }`}
+              onClick={disconnect}
+              disabled={!connected}
+            >
+              <div className={`w-2 h-2 rounded-full ${!connected ? 'bg-gray-400' : 'bg-red-400'}`} />
+              Disconnect
+            </button>
+          </div>
 
-        <div className="flex gap-2">
-          <input
-            type="text"
-            id="busId"
-            className="border rounded px-2 py-1"
-            placeholder="Enter ID"
-            value={formData.busId}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            id="longitude"
-            className="border rounded px-2 py-1"
-            placeholder="Enter Longitude"
-            value={formData.longitude}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            id="latitude"
-            className="border rounded px-2 py-1"
-            placeholder="Enter Latitude"
-            value={formData.latitude}
-            onChange={handleInputChange}
-          />
-          <button
-            className="bg-green-500 text-white px-4 py-1 rounded"
-            onClick={sendData}
-          >
-            Send
-          </button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <BusIcon className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  id="busId"
+                  className="w-full pl-10 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Bus ID"
+                  value={formData.busId}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="h-96 rounded-lg overflow-hidden border border-gray-300">
+                <MapContainer
+                  center={defaultPosition}
+                  zoom={13}
+                  className="h-full w-full"
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <LocationMarker
+                    onLocationSelect={handleLocationSelect}
+                    position={markerPosition}
+                  />
+                </MapContainer>
+              </div>
+
+              <button
+                className="w-full inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                onClick={sendData}
+              >
+                <MapPin className="w-5 h-5" />
+                Update Location
+              </button>
+            </div>
+
+            {connected && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h2 className="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  Location Updates
+                </h2>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {messages.map((msg, index) => (
+                    <div
+                      key={index}
+                      className="bg-white p-3 rounded-lg shadow-sm border border-gray-200"
+                    >
+                      <div className="font-medium text-gray-800 flex items-center gap-2">
+                        <BusIcon className="w-4 h-4 text-blue-600" />
+                        Bus ID: {msg.busId}
+                      </div>
+                      <div className="text-gray-600 pl-6">
+                        Longitude: {msg.longitude.toFixed(6)}
+                        <br />
+                        Latitude: {msg.latitude.toFixed(6)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Container>
