@@ -196,7 +196,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="mt-2 font-extrabold">
-                    <FaEllipsisH size={20} />
+                    
                   </div>
                 </div>
                 <Text className="m-2">{post.content}</Text>
@@ -266,7 +266,6 @@ export default function Home() {
                     <FaRegComment size={20} />
                     <Text size={"xs"}>{post?.commentsCount}</Text>
                   </button>
-                  <FaPaperPlane size={20} />
                 </div>
 
                 {selectedPostId === post.id && (
