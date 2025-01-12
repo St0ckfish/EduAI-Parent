@@ -12,6 +12,14 @@ import Image from "next/image";
 import BoxGrid from "~/_components/BoxGrid";
 import { RiArrowRightSLine } from "react-icons/ri";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { useGetAllStudents } from "~/APIs/hooks/useGrades";
 
 const FollowUp = () => {
   const { control } = useForm({
@@ -30,7 +38,9 @@ const FollowUp = () => {
   ];
 
   const [selectedGrade, setSelectedGrade] = useState<string>("mathematics");
-
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  
+  const { data: students, isLoading: isStudents } = useGetAllStudents();
   const subjects = [
     {
       value: "mathematics",
@@ -143,21 +153,22 @@ const FollowUp = () => {
     <Container>
       <div className="mb-8 flex gap-4 justify-between">
         <div>
-          <Controller
-            name="schoolId"
-            control={control}
-            rules={{ required: "School selection is required" }}
-            defaultValue="" // Initialize with a default value
-            render={({ field: { onChange, value } }) => (
-              <SearchableSelect
-                value={value}
-                onChange={onChange}
-                placeholder="Select School"
-                options={names}
-                border="border-borderPrimary"
-              />
-            )}
-          />
+        <Select 
+          value={selectedStudent ?? ""} 
+          onValueChange={setSelectedStudent}
+        >
+          <SelectTrigger className={`w-[250px] border bg-white border-[#f0efef]`}>
+            <SelectValue placeholder="Select Student" />
+          </SelectTrigger>
+          {students?.data?.length && (
+          <SelectContent>
+            {students?.data?.map((student:any)=>(
+              <SelectItem key={student.studentId} value={student.studentId.toString()}>
+                {student.name}
+              </SelectItem>
+            ))}
+          </SelectContent>)}
+        </Select>
         </div>
 
         <div>
