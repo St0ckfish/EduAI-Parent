@@ -255,7 +255,7 @@ const Bus: React.FC = () => {
   return (
     <Container>
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-bgPrimary rounded-lg shadow-lg p-6">
           <div className="flex items-center gap-3 mb-6">
             <BusIcon className="w-8 h-8 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-800">Bus Location Tracker</h1>
@@ -265,7 +265,7 @@ const Bus: React.FC = () => {
             <button
               className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
                 connected 
-                  ? 'bg-gray-200 cursor-not-allowed' 
+                  ? 'bg-bgSecondary cursor-not-allowed' 
                   : 'bg-blue-500 hover:bg-blue-600 text-white'
               }`}
               onClick={connect}
@@ -277,7 +277,7 @@ const Bus: React.FC = () => {
             <button
               className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
                 !connected 
-                  ? 'bg-gray-200 cursor-not-allowed' 
+                  ? 'bg-bgSecondary cursor-not-allowed' 
                   : 'bg-red-500 hover:bg-red-600 text-white'
               }`}
               onClick={disconnect}
@@ -297,7 +297,7 @@ const Bus: React.FC = () => {
                 <input
                   type="text"
                   id="busId"
-                  className="w-full pl-10 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 border border-borderPrimary rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter Bus ID"
                   value={formData.busId}
                   onChange={handleInputChange}
@@ -331,7 +331,7 @@ const Bus: React.FC = () => {
             </div>
 
             {connected && (
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bgSecondary rounded-lg p-4">
                 <h2 className="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-blue-600" />
                   Location Updates
