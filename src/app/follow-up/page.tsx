@@ -172,7 +172,7 @@ const FollowUp = () => {
         </div>
 
         <div>
-          <Button>+ Add Another Child</Button>
+          {/* <Button as="link" href="/follow-up/add-student">+ Add Another Child</Button> */}
         </div>
       </div>
 
