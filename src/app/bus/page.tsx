@@ -7,7 +7,7 @@ import { divIcon } from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import Cookies from 'js-cookie';
 import { baseUrlStock } from '~/APIs/axios';
-import { useUserDataStore } from '~/APIs/store';
+import useLanguageStore, { useUserDataStore } from '~/APIs/store';
 import Container from '~/_components/Container';
 import 'leaflet/dist/leaflet.css';
 
@@ -153,18 +153,10 @@ const Bus: React.FC = () => {
           subscribeToBusLocation(client, formData.busId);
         }
       } catch (error) {
-        console.error("Error during subscription:", error);
+        console.error('Error in connection:', error);
       }
     };
 
-    client.onWebSocketError = (error: Event) => {
-      console.error('WebSocket error:', error);
-    };
-
-    client.onStompError = (frame: Frame) => {
-      console.error('Broker reported error: ' + frame.headers.message);
-      console.error('Additional details: ' + frame.body);
-    };
 
     setStompClient(client);
 
@@ -195,7 +187,7 @@ const Bus: React.FC = () => {
       setMessages([]);
     }
   }, [stompClient, currentSubscription]);
-
+  const { language } = useLanguageStore();
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
@@ -254,112 +246,150 @@ const Bus: React.FC = () => {
 
   return (
     <Container>
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="bg-bgPrimary rounded-lg shadow-lg p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <BusIcon className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-800">Bus Location Tracker</h1>
-          </div>
-          
-          <div className="mb-6 space-x-4">
-            <button
-              className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
-                connected 
-                  ? 'bg-bgSecondary cursor-not-allowed' 
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-              onClick={connect}
-              disabled={connected}
-            >
-              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-gray-400' : 'bg-green-400'}`} />
-              Connect
-            </button>
-            <button
-              className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
-                !connected 
-                  ? 'bg-bgSecondary cursor-not-allowed' 
-                  : 'bg-red-500 hover:bg-red-600 text-white'
-              }`}
-              onClick={disconnect}
-              disabled={!connected}
-            >
-              <div className={`w-2 h-2 rounded-full ${!connected ? 'bg-gray-400' : 'bg-red-400'}`} />
-              Disconnect
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <BusIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  id="busId"
-                  className="w-full pl-10 border border-borderPrimary rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter Bus ID"
-                  value={formData.busId}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div className="h-96 rounded-lg overflow-hidden border border-gray-300">
-                <MapContainer
-                  center={defaultPosition}
-                  zoom={13}
-                  className="h-full w-full"
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  <LocationMarker
-                    onLocationSelect={handleLocationSelect}
-                    position={markerPosition}
-                  />
-                </MapContainer>
-              </div>
-
-              <button
-                className="w-full inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-                onClick={sendData}
-              >
-                <MapPin className="w-5 h-5" />
-                Update Location
-              </button>
-            </div>
-
-            {connected && (
-              <div className="bg-bgSecondary rounded-lg p-4">
-                <h2 className="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-600" />
-                  Location Updates
-                </h2>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {messages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className="bg-white p-3 rounded-lg shadow-sm border border-gray-200"
-                    >
-                      <div className="font-medium text-gray-800 flex items-center gap-2">
-                        <BusIcon className="w-4 h-4 text-blue-600" />
-                        Bus ID: {msg.busId}
-                      </div>
-                      <div className="text-gray-600 pl-6">
-                        Longitude: {msg.longitude.toFixed(6)}
-                        <br />
-                        Latitude: {msg.latitude.toFixed(6)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+  <div className="p-6 max-w-7xl mx-auto">
+    <div className="bg-bgPrimary rounded-lg shadow-lg p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <BusIcon className="w-8 h-8 text-blue-600" />
+        <h1 className="text-3xl font-bold text-gray-800">
+          {language === 'fr' 
+            ? 'Suivi de localisation des bus'
+            : language === 'ar' 
+            ? 'تعقب موقع الحافلة'
+            : 'Bus Location Tracker'}
+        </h1>
       </div>
-    </Container>
+      <div className="mb-6 space-x-4">
+        <button
+          className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+            connected 
+              ? 'bg-bgSecondary cursor-not-allowed' 
+              : 'bg-blue-500 hover:bg-blue-600 text-white'
+          }`}
+          onClick={connect}
+          disabled={connected}
+        >
+          <div className={`w-2 h-2 rounded-full ${connected ? 'bg-gray-400' : 'bg-green-400'}`} />
+          {language === 'fr' 
+            ? 'Connecter'
+            : language === 'ar' 
+            ? 'توصيل'
+            : 'Connect'}
+        </button>
+        <button
+          className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+            !connected 
+              ? 'bg-bgSecondary cursor-not-allowed' 
+              : 'bg-red-500 hover:bg-red-600 text-white'
+          }`}
+          onClick={disconnect}
+          disabled={!connected}
+        >
+          <div className={`w-2 h-2 rounded-full ${!connected ? 'bg-gray-400' : 'bg-red-400'}`} />
+          {language === 'fr' 
+            ? 'Déconnecter'
+            : language === 'ar' 
+            ? 'فصل'
+            : 'Disconnect'}
+        </button>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <BusIcon className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              id="busId"
+              className="w-full pl-10 border border-borderPrimary rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={
+                language === 'fr' 
+                  ? 'Entrez l’ID du bus'
+                  : language === 'ar' 
+                  ? 'أدخل معرف الحافلة'
+                  : 'Enter Bus ID'
+              }
+              value={formData.busId}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="h-96 rounded-lg overflow-hidden border border-gray-300">
+            <MapContainer
+              center={defaultPosition}
+              zoom={13}
+              className="h-full w-full"
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <LocationMarker
+                onLocationSelect={handleLocationSelect}
+                position={markerPosition}
+              />
+            </MapContainer>
+          </div>
+
+          <button
+            className="w-full inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+            onClick={sendData}
+          >
+            <MapPin className="w-5 h-5" />
+            {language === 'fr' 
+              ? 'Mettre à jour la localisation'
+              : language === 'ar' 
+              ? 'تحديث الموقع'
+              : 'Update Location'}
+          </button>
+        </div>
+
+        {connected && (
+          <div className="bg-bgSecondary rounded-lg p-4">
+            <h2 className="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-blue-600" />
+              {language === 'fr' 
+                ? 'Mises à jour de localisation'
+                : language === 'ar' 
+                ? 'تحديثات الموقع'
+                : 'Location Updates'}
+            </h2>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-3 rounded-lg shadow-sm border border-gray-200"
+                >
+                  <div className="font-medium text-gray-800 flex items-center gap-2">
+                    <BusIcon className="w-4 h-4 text-blue-600" />
+                    {language === 'fr' 
+                      ? `ID de bus : ${msg.busId}`
+                      : language === 'ar' 
+                      ? `رقم معرف الحافلة: ${msg.busId}`
+                      : `Bus ID: ${msg.busId}`}
+                  </div>
+                  <div className="text-gray-600 pl-6">
+                    {language === 'fr' 
+                      ? `Longitude : ${msg.longitude.toFixed(6)}
+                        
+ Latitude : ${msg.latitude.toFixed(6)}`
+                      : language === 'ar' 
+                      ? `الخط الطولي: ${msg.longitude.toFixed(6)}
+                        
+ العرض: ${msg.latitude.toFixed(6)}`
+                      : `Longitude: ${msg.longitude.toFixed(6)}
+                        
+ Latitude: ${msg.latitude.toFixed(6)}`}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</Container>
   );
 };
 

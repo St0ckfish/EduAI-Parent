@@ -30,6 +30,7 @@ import {
 import { useGetAllPosts, useLikePost } from "~/APIs/hooks/usePost";
 import Image from "next/image";
 import ImageComponent from "~/_components/ImageSrc";
+import useLanguageStore from "~/APIs/store";
 
 export default function Home() {
   const {
@@ -41,23 +42,48 @@ export default function Home() {
 
   const { mutate: addAttendance } = useAddAttendance({
     onSuccess: () => {
-      toast.success("Attendance confirmed successfully!");
+      toast.success(
+        language === "ar"
+          ? "تم تأكيد الحضور بنجاح!"
+          : language === "fr"
+          ? "Présence confirmée avec succès!"
+          : "Attendance confirmed successfully!"
+      );
       void refetchEvents();
     },
     onError: () => {
-      toast.error("Error confirmed attendance!");
+      toast.error(
+        language === "ar"
+          ? "خطأ في تأكيد الحضور!"
+          : language === "fr"
+          ? "Erreur lors de la confirmation de la présence!"
+          : "Error confirming attendance!"
+      );
     },
   });
-
+  
   const { mutate: removeAttendance } = useRemoveAttendance({
     onSuccess: () => {
-      toast.success("Attendance removed successfully!");
+      toast.success(
+        language === "ar"
+          ? "تم إزالة الحضور بنجاح!"
+          : language === "fr"
+          ? "Présence supprimée avec succès!"
+          : "Attendance removed successfully!"
+      );
       void refetchEvents();
     },
     onError: () => {
-      toast.success("Error remove attendance!");
+      toast.error(
+        language === "ar"
+          ? "خطأ في إزالة الحضور!"
+          : language === "fr"
+          ? "Erreur lors de la suppression de la présence!"
+          : "Error removing attendance!"
+      );
     },
   });
+  
 
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [comment, setComment] = useState("");
@@ -83,7 +109,7 @@ export default function Home() {
 
     return { todayEvents, upcomingEvents };
   };
-
+  const { language } = useLanguageStore();
   useEffect(() => {
     if (dataEvents?.data?.content) {
       const { todayEvents, upcomingEvents } = categorizeEvents(
@@ -230,7 +256,11 @@ export default function Home() {
                       {post.attachments.length > 6 && (
                         <div className="relative flex items-center justify-center rounded-md bg-gray-200">
                           <Text font="bold" size="lg" className="text-primary">
-                            +{post.attachments.length - 6} more
+                            +{post.attachments.length - 6}  {language === "ar"
+    ? "المزيد"
+    : language === "fr"
+    ? "plus"
+    : "more"}
                           </Text>
                         </div>
                       )}
@@ -299,8 +329,12 @@ export default function Home() {
 
                         {comments?.data.content.length === 0 && (
                           <Text color="gray" className="py-4 text-center">
-                            No comments yet
-                          </Text>
+                          {language === "ar"
+                            ? "لا توجد تعليقات حتى الآن"
+                            : language === "fr"
+                            ? "Pas encore de commentaires"
+                            : "No comments yet"}
+                        </Text>
                         )}
                       </>
                     )}
@@ -310,7 +344,13 @@ export default function Home() {
                       <Input
                         border="gray"
                         theme="comment"
-                        placeholder="Add comment..."
+                        placeholder={
+                          language === "ar"
+                            ? "أضف تعليقًا..."
+                            : language === "fr"
+                            ? "Ajouter un commentaire..."
+                            : "Add comment..."
+                        }
                         type="comment"
                         value={comment} // Set the input value to the state
                         onChange={(e) => setComment(e.target.value)} // Update state on input change
@@ -329,9 +369,14 @@ export default function Home() {
         </div>
         <div className="w-full rounded-md bg-bgPrimary p-4 md:w-1/2">
           <div>
-            <Text font="bold" size="2xl">
-              Today&apos;s Events
-            </Text>
+          <Text font="bold" size="2xl">
+  {language === "ar"
+    ? "فعاليات اليوم"
+    : language === "fr"
+    ? "Événements d'aujourd'hui"
+    : "Today's Events"}
+</Text>
+
             {todayEvents.length > 0 ? (
               todayEvents.map((event) => (
                 <div
@@ -373,7 +418,11 @@ export default function Home() {
                               }
                               color="secondary"
                             >
-                              Attendance Confirmed
+                             {language === "ar"
+                         ? "تم تأكيد الحضور"
+                         : language === "fr"
+                         ? "Présence confirmée"
+                         : "Attendance Confirmed"}
                             </Button>
                           ) : (
                             <Button
@@ -381,7 +430,11 @@ export default function Home() {
                                 handleConfirmAttendance(event.id.toString())
                               }
                             >
-                              Confirm Attendance
+                              {language === "ar"
+                         ? "تأكيد الحضور"
+                         : language === "fr"
+                         ? "Confirmer la présence"
+                         : "Confirm Attendance"}
                             </Button>
                           )}
                         </div>
@@ -391,7 +444,13 @@ export default function Home() {
                 </div>
               ))
             ) : (
-              <Text color="gray" font={"semiBold"} size={"lg"} className="m-2">No events scheduled for today.</Text>
+              <Text color="gray" font="semiBold" size="lg" className="m-2">
+  {language === "ar"
+    ? "لا توجد فعاليات مجدولة لليوم."
+    : language === "fr"
+    ? "Aucun événement prévu pour aujourd'hui."
+    : "No events scheduled for today."}
+</Text>
             )}
           </div>
 
@@ -434,29 +493,41 @@ export default function Home() {
                     </div>
                     <div>
                       {event.isAttendee ? (
-                        <Button
-                          onClick={() =>
-                            handleRemoveAttendance(event.id.toString())
-                          }
-                          color="secondary"
-                        >
-                          Attendance Confirmed
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() =>
-                            handleConfirmAttendance(event.id.toString())
-                          }
-                        >
-                          Confirm Attendance
-                        </Button>
+                       <Button
+                       onClick={() => handleRemoveAttendance(event.id.toString())}
+                       color="secondary"
+                     >
+                       {language === "ar"
+                         ? "تم تأكيد الحضور"
+                         : language === "fr"
+                         ? "Présence confirmée"
+                         : "Attendance Confirmed"}
+                     </Button>
+                     ) : (
+                     <Button
+                       onClick={() => handleConfirmAttendance(event.id.toString())}
+                     >
+                       {language === "ar"
+                         ? "تأكيد الحضور"
+                         : language === "fr"
+                         ? "Confirmer la présence"
+                         : "Confirm Attendance"}
+                     </Button>
+                     
                       )}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <Text color="gray" font={"semiBold"} size={"lg"} className="m-2">No upcoming events scheduled.</Text>
+              <Text color="gray" font="semiBold" size="lg" className="m-2">
+  {language === "ar"
+    ? "لا توجد فعاليات قادمة مجدولة."
+    : language === "fr"
+    ? "Aucun événement à venir programmé."
+    : "No upcoming events scheduled."}
+</Text>
+
             )}
           </div>
         </div>

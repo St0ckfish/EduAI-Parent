@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
+/* eslint-disable @next/next/no-img-element */
 import Container from "~/_components/Container";
 import * as React from "react";
 import { Calendar } from "~/components/ui/calendar";
@@ -23,6 +23,7 @@ import {
 import { useGetAllStudents } from "~/APIs/hooks/useGrades";
 import { useGetAllAttendances, useGetAllAttendancesSumm, useGetAllHomeWorks, useGetAllMaterials, useGetAllSchedule } from "~/APIs/hooks/useHomeWork";
 import Spinner from "~/_components/Spinner";
+import useLanguageStore from "~/APIs/store";
 
 function CalendarDemo({
   onDateSelect,
@@ -58,7 +59,100 @@ const Schedule = () => {
     [selectedDate],
   );
 
-  // Get homeworks based on selected student and date
+  const { language } = useLanguageStore();
+
+const t = (key: string) => {
+  const translations: Record<string, Record<string, string>> = {
+    selectStudent: {
+      en: "Select Student",
+      ar: "اختر الطالب",
+      fr: "Sélectionnez un étudiant",
+    },
+    todayClasses: {
+      en: "Today Classes",
+      ar: "حصص اليوم",
+      fr: "Cours d'aujourd'hui",
+    },
+    subject: {
+      en: "Subject",
+      ar: "الموضوع",
+      fr: "Sujet",
+    },
+    teacher: {
+      en: "Teacher",
+      ar: "المعلم",
+      fr: "Enseignant",
+    },
+    time: {
+      en: "Time",
+      ar: "الوقت",
+      fr: "Heure",
+    },
+    day: {
+      en: "Day",
+      ar: "اليوم",
+      fr: "Jour",
+    },
+    noHomework: {
+      en: "No homework assigned for this date",
+      ar: "لا توجد واجبات منزلية لهذا التاريخ",
+      fr: "Aucun devoir assigné pour cette date",
+    },
+    noMaterials: {
+      en: "No materials assigned for this date",
+      ar: "لا توجد مواد لهذا التاريخ",
+      fr: "Aucun matériel assigné pour cette date",
+    },
+    todayAttendance: {
+      en: "Today's Attendance",
+      ar: "حضور اليوم",
+      fr: "Présence d'aujourd'hui",
+    },
+    attendanceSummary: {
+      en: "Attendance Summary",
+      ar: "ملخص الحضور",
+      fr: "Résumé de la présence",
+    },
+    last30Days: {
+      en: "Last 30 Days",
+      ar: "آخر 30 يومًا",
+      fr: "Les 30 derniers jours",
+    },
+    totalClasses: {
+      en: "Total Classes",
+      ar: "إجمالي الحصص",
+      fr: "Total des cours",
+    },
+    presence: {
+      en: "Presence",
+      ar: "الحضور",
+      fr: "Présence",
+    },
+    absence: {
+      en: "Absence",
+      ar: "الغياب",
+      fr: "Absence",
+    },
+    late: {
+      en: "Late",
+      ar: "متأخر",
+      fr: "En retard",
+    },
+    todayMaterials: {
+      en: "Today's Materials",
+      ar: "مواد اليوم",
+      fr: "Matériaux d'aujourd'hui",
+    },
+    todayHomework: {
+      en: "Today's Homework",
+      ar: "واجب اليوم",
+      fr: "Devoirs d'aujourd'hui",
+    },
+  };
+
+  return translations[key]?.[language] ?? key;
+};
+
   const { data: homeworks, isLoading: isHomeworksLoading } = useGetAllHomeWorks(
     selectedStudent,
     formattedDate
@@ -67,97 +161,23 @@ const Schedule = () => {
     selectedStudent,
     formattedDate
   );
-  const { data: attendance, isLoading: isAttendee } = useGetAllAttendances(
+  const { data: attendance } = useGetAllAttendances(
     selectedStudent,
     formattedDate
   );
-  const { data: attendanceSumm, isLoading: isAttendeeSumm } = useGetAllAttendancesSumm(
+  const { data: attendanceSumm } = useGetAllAttendancesSumm(
     selectedStudent
   );
-  
-  const { data: schedule, isLoading: isSchedule } = useGetAllSchedule(
+  const { data: schedule } = useGetAllSchedule(
     selectedStudent,
     formattedDate
   );
-  
-  // Set first student as default when students data is loaded
+
   useEffect(() => {
     if (students?.data?.length && !selectedStudent) {
       setSelectedStudent(students.data[0].studentId.toString());
     }
   }, [students?.data, selectedStudent]);
-
-  function convertToAmPm(time24: string): string {
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
-    const match = timeRegex.exec(time24);
-
-    if (!match) {
-      throw new Error(
-        "Invalid time format. Please use HH:MM:SS in 24-hour format.",
-      );
-    }
-
-    const [hoursStr, minutes] = match;
-    let hours = parseInt(hoursStr, 10);
-    const period = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    if (hours === 0) {
-      hours = 12;
-    }
-
-    return `${hours}:${minutes} ${period}`;
-  }
-
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-  };
-
-  const formatTime = (startTime: string, endTime: string): string => {
-    const formatHour = (time: string): string => {
-      const [hours] = time.split(':');
-      const hour = parseInt(hours || '0');
-      const period = hour >= 12 ? 'pm' : 'am';
-      const formattedHour = hour > 12 ? hour - 12 : hour;
-      return `${formattedHour}:00 ${period}`;
-    };
-
-    return `${formatHour(startTime)}-${formatHour(endTime)}`;
-  };
-
-
-  const formatTime1 = (time: any) => {
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
-    const period = hour >= 12 ? 'PM' : 'AM';
-    const formattedHour = hour > 12 ? hour - 12 : hour;
-    return `${String(formattedHour).padStart(2, '0')}:${minutes} ${period}`;
-  };
-
-  const getStatusColor = (status: any) => {
-    switch (status?.toUpperCase()) {
-      case 'PRESENT':
-        return 'bg-success text-white';
-      case 'ABSENT':
-        return 'bg-red-500 text-white';
-      case 'LATE':
-        return 'bg-yellow-500 text-white';
-      default:
-        return 'bg-gray-500 text-white';
-    }
-  };
-
-  const getLineColor = (status: any) => {
-    switch (status?.toUpperCase()) {
-      case 'PRESENT':
-        return 'text-success';
-      case 'ABSENT':
-        return 'text-red-500';
-      case 'LATE':
-        return 'text-yellow-500';
-      default:
-        return 'text-gray-500';
-    }
-  };
 
   return (
     <Container>
@@ -167,11 +187,11 @@ const Schedule = () => {
           onValueChange={setSelectedStudent}
         >
           <SelectTrigger className="w-[250px] border bg-white border-[#f0efef]">
-            <SelectValue placeholder="Select Student" />
+            <SelectValue placeholder={t("selectStudent")} />
           </SelectTrigger>
           {students?.data?.length && (
             <SelectContent>
-              {students?.data?.map((student:any) => (
+              {students?.data?.map((student: any) => (
                 <SelectItem key={student.studentId} value={student.studentId.toString()}>
                   {student.name}
                 </SelectItem>
@@ -180,196 +200,162 @@ const Schedule = () => {
           )}
         </Select>
       </div>
+
       <div className="mb-4 flex w-full gap-10 max-[1080px]:grid">
         <div className="flex overflow-auto md:overflow-visible">
-          <CalendarDemo onDateSelect={handleDateSelect} />
+          <CalendarDemo onDateSelect={setSelectedDate} />
         </div>
 
         <Box className="overflow-auto">
-          <div className="flex justify-between">
-            <Text font={"semiBold"} size={"xl"} className="mb-3">
-              Today Classes
-            </Text>
-            
-          </div>
+          <Text font={"semiBold"} size={"xl"} className="mb-3">
+            {t("todayClasses")}
+          </Text>
 
           <table className="w-full border-separate border-spacing-y-2 overflow-x-auto p-4 text-left text-sm">
-      <thead className="text-xs uppercase text-textPrimary">
-        <tr>
-          <th scope="col" className="whitespace-nowrap px-6 py-3">
-            Subject
-          </th>
-          <th scope="col" className="whitespace-nowrap px-6 py-3">
-            Teacher
-          </th>
-          <th scope="col" className="whitespace-nowrap px-6 py-3">
-            Time
-          </th>
-          <th scope="col" className="whitespace-nowrap px-6 py-3">
-            Day
-          </th>
-        </tr>
-      </thead>
-      <tbody className="rounded-lg">
-        {schedule?.data?.map((item: { id: React.Key | null | undefined; day: string; courseName: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; teacherName: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; startTime: any; endTime: any; }) => (
-          <tr 
-            key={item.id}
-            className="bg-bgSecondary font-semibold transition hover:bg-primary hover:text-white"
-          >
-            <th
-              scope="row"
-              className="whitespace-nowrap rounded-s-2xl px-6 py-4 font-medium"
-            >
-              {item.courseName}
-            </th>
-            <td className="whitespace-nowrap px-6 py-4">
-              {item.teacherName}
-            </td>
-            <td className="whitespace-nowrap px-6 py-4">
-              {formatTime(item.startTime, item.endTime)}
-            </td>
-            <td className="whitespace-nowrap rounded-e-2xl px-6 py-4">
-              {item.day}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-          
+            <thead className="text-xs uppercase text-textPrimary">
+              <tr>
+                <th scope="col" className="whitespace-nowrap px-6 py-3">
+                  {t("subject")}
+                </th>
+                <th scope="col" className="whitespace-nowrap px-6 py-3">
+                  {t("teacher")}
+                </th>
+                <th scope="col" className="whitespace-nowrap px-6 py-3">
+                  {t("time")}
+                </th>
+                <th scope="col" className="whitespace-nowrap px-6 py-3">
+                  {t("day")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="rounded-lg">
+              {schedule?.data?.map((item: any) => (
+                <tr 
+                  key={item.id}
+                  className="bg-bgSecondary font-semibold transition hover:bg-primary hover:text-white"
+                >
+                  <th
+                    scope="row"
+                    className="whitespace-nowrap rounded-s-2xl px-6 py-4 font-medium"
+                  >
+                    {item.courseName}
+                  </th>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    {item.teacherName}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    {item.startTime} - {item.endTime}
+                  </td>
+                  <td className="whitespace-nowrap rounded-e-2xl px-6 py-4">
+                    {item.day}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </Box>
       </div>
+
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-2/5 xl:w-1/3 rounded-xl bg-bgPrimary p-4 shadow h-fit">
           <Text font={"bold"} size={"xl"}>
-            Today&apos;s Attendance
+            {t("todayAttendance")}
           </Text>
-
-          {isMaterials && ( <Spinner/> )}
-          {
-            attendance?.data?.content?.map((attendance: any, idx: number)=>(
-              <div key={idx} className="mt-4 flex items-center justify-between rounded-xl border border-borderPrimary p-4">
-      <div className="flex">
-        <div>
-          <Text font="semiBold" className="mt-1">
-            {formatTime1(attendance.startTime)}
-          </Text>
-          <Text font="semiBold" color="gray" className="mt-1">
-            {formatTime1(attendance.endTime)}
-          </Text>
-        </div>
-        <PiLineVerticalBold 
-          size={60} 
-          className={getLineColor(attendance.status)}
-        />
-        <div>
-          <Text font="semiBold" className="mt-1">
-            {attendance.courseName}
-          </Text>
-        </div>
-      </div>
-      <div className={`flex h-fit items-center justify-center rounded-full px-4 py-2 ${getStatusColor(attendance.status)}`}>
-        {attendance.status?.charAt(0)?.toUpperCase() + 
-          attendance.status?.slice(1)?.toLowerCase()}
-      </div>
-    </div>
-            ))
-          }
           <Text font={"bold"} size={"lg"} className="mt-4">
-            Attendance Summary
+            {t("attendanceSummary")}
           </Text>
           <Text font={"semiBold"} color={"gray"} className="mb-4">
-            Last 30 Days
+            {t("last30Days")}
           </Text>
           <BoxGrid>
             <Box border="borderPrimary">
               <Text font={"semiBold"} color={"gray"}>
-                Total Classes
+                {t("totalClasses")}
               </Text>
               <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfAttendances}</Text>
             </Box>
             <Box border="borderPrimary">
               <Text font={"semiBold"} color={"gray"}>
-                Presence
+                {t("presence")}
               </Text>
               <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfPresentAttendances}</Text>
             </Box>
             <Box border="borderPrimary">
               <Text font={"semiBold"} color={"gray"}>
-                Absence
+                {t("absence")}
               </Text>
               <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfAbsentAttendances}</Text>
             </Box>
             <Box border="borderPrimary">
               <Text font={"semiBold"} color={"gray"}>
-                Late
+                {t("late")}
               </Text>
               <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfLateAttendances}</Text>
             </Box>
           </BoxGrid>
         </div>
-        <div className="grid w-full h-full gap-10">
-        <div className="w-full rounded-xl bg-bgPrimary p-4 shadow h-fit" >
-          <Text font={"bold"} size={"xl"} className="mb-8">
-            Today&apos;s Materials
-          </Text>
-          <div>
-            {isMaterials ? (
-            <Spinner/>
-          ) : materials?.data?.content?.length ? (
-            materials.data?.content?.map((material: any, index: number) => (
-              <div key={index} className="mt-4">
-                <Text size={"xl"} className="mb-2">
-                  Science
-                </Text>
-                <div className="flex rounded-xl border border-borderPrimary p-2">
-                  <PiLineVertical size={125} className="-ml-12 text-primary" />
-                  <div className="-ml-10 mt-2 w-[90%]">
-                    <Text size={"xl"}>{material.courseName}</Text>
-                    <Text size={"md"}>{material.startTime}</Text>
-                    <Text size={"md"}>{material.endTime}</Text>
 
+        <div className="grid w-full h-full gap-10">
+          <div className="w-full rounded-xl bg-bgPrimary p-4 shadow h-fit">
+            <Text font={"bold"} size={"xl"} className="mb-8">
+              {t("todayMaterials")}
+            </Text>
+            <div>
+              {isMaterials ? (
+                <Spinner/>
+              ) : materials?.data?.content?.length ? (
+                materials.data?.content?.map((material: any, index: number) => (
+                  <div key={index} className="mt-4">
+                    <Text size={"xl"} className="mb-2">
+                      {material.courseName}
+                    </Text>
+                    <div className="flex rounded-xl border border-borderPrimary p-2">
+                      <PiLineVertical size={125} className="-ml-12 text-primary" />
+                      <div className="-ml-10 mt-2 w-[90%]">
+                        <Text size={"xl"}>{material.courseName}</Text>
+                        <Text size={"md"}>{material.startTime}</Text>
+                        <Text size={"md"}>{material.endTime}</Text>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              ))
-            ) : (
-                <Text>No materials assigned for this date</Text>
-            )}
+                ))
+              ) : (
+                <Text>{t("noMaterials")}</Text>
+              )}
+            </div>
+          </div>
+
+          <div className="w-full rounded-xl bg-bgPrimary p-4 shadow h-fit">
+            <Text font={"bold"} size={"xl"} className="mb-8">
+              {t("todayHomework")}
+            </Text>
+            <div>
+              {isHomeworksLoading ? (
+                <Spinner/>
+              ) : homeworks?.data?.content?.length ? (
+                homeworks.data?.content?.map((homework: any, index: number) => (
+                  <div key={homework.id} className={index > 0 ? "mt-4" : ""}>
+                    <div className="flex rounded-xl border border-borderPrimary p-2">
+                      <PiLineVertical size={125} className="-ml-12 text-primary" />
+                      <div className="-ml-10 mt-2 w-[90%]">
+                        <Text size={"xl"} font={"medium"}>{homework.title}</Text>
+                        <Text size={"lg"}>{homework.courseName}</Text>
+                        <Text font={"semiBold"} color={homework.done ? "success" : "error"}>
+                          Deadline: {format(new Date(homework.deadline), "dd MMM (EEEE)")}
+                        </Text>
+                        <Text color={"gray"} className="my-1">
+                          {homework.description}
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <Text>{t("noHomework")}</Text>
+              )}
+            </div>
           </div>
         </div>
-
-             <div className="w-full rounded-xl bg-bgPrimary p-4 shadow h-fit">
-        <Text font={"bold"} size={"xl"} className="mb-8">
-          Today&apos;s Homework
-        </Text>
-        <div>
-          {isHomeworksLoading ? (
-            <Spinner/>
-          ) : homeworks?.data?.content?.length ? (
-            homeworks.data?.content?.map((homework: any, index: number) => (
-              <div key={homework.id} className={index > 0 ? "mt-4" : ""}>
-                <div className="flex rounded-xl border border-borderPrimary p-2">
-                  <PiLineVertical size={125} className="-ml-12 text-primary" />
-                  <div className="-ml-10 mt-2 w-[90%]">
-                    <Text size={"xl"} font={"medium"}>{homework.title}</Text>
-                    <Text size={"lg"} >{homework.courseName}</Text>
-                    <Text font={"semiBold"} color={homework.done ? "success" : "error"}>
-                      Deadline: {format(new Date(homework.deadline), "dd MMM (EEEE)")}
-                    </Text>
-                    <Text color={"gray"} className="my-1">
-                      {homework.description}
-                    </Text>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <Text>No homework assigned for this date</Text>
-          )}
-        </div>
-        
-        </div>
-      </div>
       </div>
     </Container>
   );

@@ -15,9 +15,10 @@ import { FaStar } from "react-icons/fa6";
 import { Switch } from "~/components/ui/switch";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Cookie from "js-cookie";
-import { useBooleanValue, useUserDataStore } from "~/APIs/store";
+import useLanguageStore, { useBooleanValue, useUserDataStore } from "~/APIs/store";
 import { useProfile } from "~/APIs/hooks/useProfile";
 import { useNotificationsWebSocket } from "~/hooks/useNotifications";
+import { Globe } from "lucide-react";
 
 const useWindowDimensions = () => {
   const isClient = typeof window === "object";
@@ -150,18 +151,39 @@ const { notificationsCount, isConnected } = useNotificationsWebSocket(userId);
   const OpenSideBar = () => {
     setIsOpen(!isOpen);
   };
+  const { language, setLanguage } = useLanguageStore();
+  const [isOpenL, setIsOpenL] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  
+  const languages = [
+    { code: 'en', label: 'English' },
+    { code: 'ar', label: 'العربية' },
+    { code: 'fr', label: 'Français' },
+  ]
+
+  useEffect(() => {
+    const handleClickOutside = (event: { target: any; }) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpenL(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
 
+  
 
   const navLinks = [
-    { href: "/", icon: AiFillHome, label: "Home" },
-    { href: "/grades", icon: FaStar, label: "Grades" },
-    { href: "/academic", icon: FaGraduationCap, label: "Academic" },
-    { href: "/follow-up", icon: IoPersonSharp, label: "Follow up" },
-    { href: "/bus", icon: FaBusAlt, label: "Bus Tracker" },
-    { href: "/finance", icon: MdAttachMoney, label: "Finance" },
-    { href: "/complaint", icon: FiFlag, label: "Complaint" },
-    { href: "/exam", icon: FaPencilAlt, label: "Exam" },
+    { href: "/", icon: AiFillHome, label: language === "ar" ? "الرئيسية" : language === "fr" ? "Accueil" : "Home" },
+    { href: "/grades", icon: FaStar, label: language === "ar" ? "الدرجات" : language === "fr" ? "Notes" : "Grades" },
+    { href: "/academic", icon: FaGraduationCap, label: language === "ar" ? "الأكاديمي" : language === "fr" ? "Académique" : "Academic" },
+    { href: "/follow-up", icon: IoPersonSharp, label: language === "ar" ? "المتابعة" : language === "fr" ? "Suivi" : "Follow up" },
+    { href: "/bus", icon: FaBusAlt, label: language === "ar" ? "تتبع الحافلة" : language === "fr" ? "Suivi du bus" : "Bus Tracker" },
+    { href: "/finance", icon: MdAttachMoney, label: language === "ar" ? "المالية" : language === "fr" ? "Finance" : "Finance" },
+    { href: "/complaint", icon: FiFlag, label: language === "ar" ? "الشكاوى" : language === "fr" ? "Réclamation" : "Complaint" },
+    { href: "/exam", icon: FaPencilAlt, label: language === "ar" ? "الاختبار" : language === "fr" ? "Examen" : "Exam" },
   ];
 
   // if (!isClient)
@@ -270,6 +292,35 @@ const { notificationsCount, isConnected } = useNotificationsWebSocket(userId);
                     </svg>
                   </Link>
 
+                  <div className="relative" ref={dropdownRef}>
+      <button
+        className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
+        onClick={() => setIsOpenL(!isOpenL)}
+      >
+        <Globe className="h-4 w-4" />
+        <span>{languages.find(lang => lang.code === language)?.label}</span>
+      </button>
+      
+      {isOpenL && (
+        <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg">
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => {
+                setLanguage(lang.code)
+                setIsOpenL(false)
+              }}
+              className={`w-full text-left px-4 py-2 hover:bg-gray-50 ${
+                language === lang.code ? 'bg-gray-100' : ''
+              }`}
+            >
+              {lang.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+
                   <div className="hs-dropdown relative inline-flex [--placement:bottom-right]">
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger asChild>
@@ -298,7 +349,11 @@ const { notificationsCount, isConnected } = useNotificationsWebSocket(userId);
                         >
                           <div className="rounded-t-lg bg-bgPrimary px-5 py-3">
                             <p className="text-textPrimary text-sm">
-                              Signed in as
+                            {language === "ar"
+                              ? "تم تسجيل الدخول كـ"
+                              : language === "fr"
+                              ? "Connecté en tant que"
+                              : "Signed in as"}
                             </p>
                             <p className="text-textPrimary text-sm font-medium">
                             {userData?.email}
@@ -327,7 +382,11 @@ const { notificationsCount, isConnected } = useNotificationsWebSocket(userId);
                                   <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
                                   <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                                 </svg>
-                                Profile
+                                {language === "ar"
+                                ? "الملف الشخصي"
+                                : language === "fr"
+                                ? "Profil"
+                                : "Profile"}
                               </Link>
                             </DropdownMenu.Item>
                             <DropdownMenu.Item asChild>
@@ -336,7 +395,11 @@ const { notificationsCount, isConnected } = useNotificationsWebSocket(userId);
                                 className="text-textPrimary flex items-center gap-x-3.5 rounded-lg border-none px-3 py-2 text-sm outline-none hover:bg-error hover:text-white"
                                 href="/login"
                               >
-                                Sign out
+                                {language === "ar"
+                                  ? "تسجيل الخروج"
+                                  : language === "fr"
+                                  ? "Se déconnecter"
+                                  : "Sign out"}
                               </a>
                             </DropdownMenu.Item>
                           </div>

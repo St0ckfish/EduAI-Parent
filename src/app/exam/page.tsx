@@ -10,7 +10,8 @@ import {
   useGetUpcomingExamsByStudentId,
 } from "~/APIs/hooks/useExam";
 import { useGetStudentsSimpleData } from "~/APIs/hooks/useStudent";
-import { ExamById, StudentSimpleData } from "~/types";
+import useLanguageStore from "~/APIs/store";
+import { type ExamById, type StudentSimpleData } from "~/types";
 
 const Exam = () => {
   const { data: dataStudents, isLoading: isLoadingStudents } = useGetStudentsSimpleData();
@@ -23,12 +24,21 @@ const Exam = () => {
   const handleSelectExam = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStudentId(event.target.value);
   };
+  const { language } = useLanguageStore();
+
+  const translate = (en: string, fr: string, ar: string) => {
+    return language === 'fr' ? fr : language === 'ar' ? ar : en;
+  };
 
   const renderExams = (data: any, type: "Previous" | "Upcoming") => {
     if (!data || data.length === 0) {
       return (
         <Text font="semiBold" size="xl">
-          No {type.toLowerCase()} exams found for the selected student.
+          {translate(
+            `No ${type.toLowerCase()} exams found for the selected student.`,
+            `Aucun examen ${type.toLowerCase()} trouvé pour l'étudiant sélectionné.`,
+            `لا توجد اختبارات ${type === 'Previous' ? 'سابقة' : 'قادمة'} للطالب المحدد.`
+          )}
         </Text>
       );
     }
@@ -36,31 +46,31 @@ const Exam = () => {
     return (
       <div className="relative w-full overflow-auto sm:rounded-lg">
         <Text font="bold" size="2xl" className="mb-4">
-          {type} Exams
+          {translate(`${type} Exams`, `${type === 'Previous' ? 'Examens précédents' : 'Examens à venir'}`, `${type === 'Previous' ? 'الاختبارات السابقة' : 'الاختبارات القادمة'}`)}
         </Text>
         <table className="w-full border-separate border-spacing-y-2 overflow-x-auto p-4 text-left text-sm text-textPrimary">
           <thead className="text-xs uppercase text-textPrimary">
             <tr>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
-                Title
+                {translate('Title', 'Titre', 'العنوان')}
               </th>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
-                Score
+                {translate('Score', 'Score', 'الدرجة')}
               </th>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
-                Class
+                {translate('Class', 'Classe', 'الصف')}
               </th>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
-                Exam Type
+                {translate('Exam Type', 'Type d\'examen', 'نوع الاختبار')}
               </th>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
-                Exam Beginning
+                {translate('Exam Beginning', 'Début de l\'examen', 'بداية الاختبار')}
               </th>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
-                Exam Ending
+                {translate('Exam Ending', 'Fin de l\'examen', 'نهاية الاختبار')}
               </th>
               <th scope="col" className="whitespace-nowrap px-6 py-3">
-                Exam Date
+                {translate('Exam Date', 'Date de l\'examen', 'تاريخ الاختبار')}
               </th>
             </tr>
           </thead>
@@ -98,7 +108,6 @@ const Exam = () => {
     );
   };
 
-  // Show loading text if any data is still loading
   if (isLoadingStudents || isLoadingUpcomingExams || isLoadingPreviousExams) {
     return (
       <Container>
@@ -119,14 +128,14 @@ const Exam = () => {
             theme={viewMode === "previous" ? "solid" : "outline"}
             onClick={() => setViewMode("previous")}
           >
-            Previous Exams
+            {translate('Previous Exams', 'Examens précédents', 'الاختبارات السابقة')}
           </Button>
           <Button
             className="text-sm md:text-md"
             theme={viewMode === "upcoming" ? "solid" : "outline"}
             onClick={() => setViewMode("upcoming")}
           >
-            Upcoming Exams
+            {translate('Upcoming Exams', 'Examens à venir', 'الاختبارات القادمة')}
           </Button>
         </div>
 
@@ -135,7 +144,9 @@ const Exam = () => {
             className="flex w-full text-sm md:text-md items-center gap-3 whitespace-nowrap rounded-xl bg-bgPrimary px-6 py-4 font-semibold outline-none duration-200 ease-in hover:shadow-lg"
             onChange={handleSelectExam}
           >
-            <option value="">Select Student</option>
+            <option value="">
+              {translate('Select Student', 'Sélectionner un étudiant', 'اختر الطالب')}
+            </option>
             {dataStudents?.data.map((student: StudentSimpleData) => (
               <option key={student.studentId} value={student.studentId}>
                 {student.name}
@@ -153,7 +164,11 @@ const Exam = () => {
               : renderExams(dataUpcomingExams?.data, "Upcoming")
           ) : (
             <Text font="semiBold" size="xl">
-              Select a student to view their exams
+              {translate(
+                'Select a student to view their exams',
+                'Sélectionnez un étudiant pour voir ses examens',
+                'اختر الطالب لعرض اختباراته'
+              )}
             </Text>
           )}
         </div>
