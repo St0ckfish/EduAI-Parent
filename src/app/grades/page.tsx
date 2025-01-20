@@ -113,7 +113,7 @@ const Grades = () => {
       <div className="flex w-full items-center justify-between gap-4">
         {/* Academic Year Select */}
         <Select value={selectedAcademicYear || ""} onValueChange={setSelectedAcademicYear}>
-          <SelectTrigger className={`w-full border bg-white border-[#f0efef]`}>
+          <SelectTrigger className={`w-full border bg-bgPrimary border-borderPrimary`}>
             <SelectValue placeholder={t("selectAcademicYear")} />
           </SelectTrigger>
           <SelectContent>
@@ -131,7 +131,7 @@ const Grades = () => {
           onValueChange={setSelectedSemester}
           disabled={!selectedAcademicYear}
         >
-          <SelectTrigger className={`w-full border bg-white border-[#f0efef]`}>
+          <SelectTrigger className={`w-full border bg-bgPrimary border-borderPrimary`}>
             <SelectValue placeholder={t("selectSemester")} />
           </SelectTrigger>
           <SelectContent>
@@ -149,7 +149,7 @@ const Grades = () => {
           onValueChange={setSelectedStudent}
           disabled={!selectedSemester}
         >
-          <SelectTrigger className={`w-full border bg-white border-[#f0efef]`}>
+          <SelectTrigger className={`w-full border bg-bgPrimary border-borderPrimary`}>
             <SelectValue placeholder={t("selectStudent")} />
           </SelectTrigger>
           {students?.data?.length && (
