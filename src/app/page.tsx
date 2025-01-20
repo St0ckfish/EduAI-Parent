@@ -120,6 +120,11 @@ export default function Home() {
     }
   }, [dataEvents]);
 
+  const translate = (en: string, fr: string, ar: string) => {
+    const language = useLanguageStore.getState().language;
+    return language === "fr" ? fr : language === "ar" ? ar : en;
+  };
+
   const {
     data: comments,
     refetch: refetchComments,
@@ -455,9 +460,9 @@ export default function Home() {
           </div>
 
           <div className="my-2">
-            <Text font="bold" size="2xl">
-              Upcoming Events
-            </Text>
+          <Text font="bold" size="2xl">
+  {translate("Upcoming Events", "Événements à venir", "الأحداث القادمة")}
+</Text>
             {upcomingEvents.length > 0 ? (
               upcomingEvents.map((event) => (
                 <div key={event.id} className="my-4">
