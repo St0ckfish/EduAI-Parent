@@ -187,7 +187,7 @@ const Bus: React.FC = () => {
       setMessages([]);
     }
   }, [stompClient, currentSubscription]);
-  const { language } = useLanguageStore();
+  const language = useLanguageStore((state) => state.language);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({

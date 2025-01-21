@@ -3,7 +3,7 @@ import useLanguageStore, { useBooleanValue } from "~/APIs/store";
 import { cn } from "~/lib/utils";
 
 const Container = ({ children }: { children: ReactNode }) => {
-  const { language } = useLanguageStore();
+  const language = useLanguageStore((state) => state.language);
   const bool = useBooleanValue((state) => state.boolean);
   
   return (

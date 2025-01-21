@@ -109,7 +109,8 @@ export default function Home() {
 
     return { todayEvents, upcomingEvents };
   };
-  const { language } = useLanguageStore();
+  const language = useLanguageStore((state) => state.language);
+
   useEffect(() => {
     if (dataEvents?.data?.content) {
       const { todayEvents, upcomingEvents } = categorizeEvents(
@@ -121,7 +122,6 @@ export default function Home() {
   }, [dataEvents]);
 
   const translate = (en: string, fr: string, ar: string) => {
-    const language = useLanguageStore.getState().language;
     return language === "fr" ? fr : language === "ar" ? ar : en;
   };
 

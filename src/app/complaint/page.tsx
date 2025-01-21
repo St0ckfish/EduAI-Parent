@@ -24,8 +24,8 @@ const Complaint = () => {
   >(); // Added state for teacher selection
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const language = useLanguageStore((state) => state.language);
   const translate = (en: string, fr: string, ar: string) => {
-    const language = useLanguageStore.getState().language; // Assuming useLanguageStore manages language state
     return language === "fr" ? fr : language === "ar" ? ar : en;
   };
   const { mutate: createComplaintMutation } = useCreateComplaint({
@@ -144,7 +144,7 @@ const Complaint = () => {
   <div className="m-4 mb-4 flex flex-col-reverse items-start justify-between gap-4 md:flex-row">
     <div className="flex w-full flex-col gap-4 rounded-xl bg-bgPrimary p-4">
       <Text font={"bold"} size={"4xl"}>
-        الشكاوى
+        {translate("Complaints", "Plaintes", "الشكاوى")}
       </Text>
       <div className="border-b border-borderPrimary pb-4">
         {data?.data.content.map((compliant) => (
@@ -182,7 +182,7 @@ const Complaint = () => {
     </div>
     <div className="w-full rounded-xl bg-bgPrimary p-4 md:w-1/2">
       <Text font={"bold"} size={"2xl"}>
-        إضافة شكوى
+        {translate("Add Complaint", "Ajouter une plainte", "إضافة شكوى")}
       </Text>
       <div className="w-full">
         <label htmlFor="student">
@@ -192,7 +192,9 @@ const Complaint = () => {
             className="mt-4 w-full rounded-lg border border-borderPrimary bg-bgPrimary p-3 text-textPrimary outline-none transition duration-200 ease-in"
             onChange={handleStudentChange}
           >
-            <option value="">اختر الطالب</option>
+            <option value="">
+              {translate("Select student", "Sélectionnez un étudiant", "اختر الطالب")}
+            </option>
             {dataStudents?.data.content?.map((student: Student) => (
               <option key={student.studentId} value={student.studentId}>
                 {student.studentName}
@@ -207,7 +209,9 @@ const Complaint = () => {
             className="mt-4 w-full rounded-lg border border-borderPrimary bg-bgPrimary p-3 text-textPrimary outline-none transition duration-200 ease-in"
             onChange={handleTeacherChange} // Handle teacher selection
           >
-            <option value="">اختر المعلم</option>
+            <option value="">
+              {translate("Select teacher", "Sélectionnez un enseignant", "اختر المعلم")}
+            </option>
             {dataStudentTeacher?.data?.map((teacher: any) => (
               <option key={teacher.id} value={teacher.id}>
                 {teacher.name}
@@ -218,7 +222,7 @@ const Complaint = () => {
 
         <label htmlFor="subject">
           <Input
-            placeholder="الموضوع"
+            placeholder={translate("Subject", "Sujet", "الموضوع")}
             theme="transparent"
             className="mt-4"
             border="gray"
@@ -230,7 +234,11 @@ const Complaint = () => {
         <label htmlFor="area">
           <Input
             id="message"
-            placeholder="اكتب المشكلة"
+            placeholder={translate(
+              "Write the problem",
+              "Décrivez le problème",
+              "اكتب المشكلة",
+            )}
             theme="transparent"
             className="mt-4 py-10"
             border="gray"
@@ -240,12 +248,13 @@ const Complaint = () => {
         </label>
 
         <Button onClick={handleSubmit} className="mt-4">
-          إرسال
+          {translate("Submit", "Envoyer", "إرسال")}
         </Button>
       </div>
     </div>
   </div>
 </Container>
+
 
     </>
   );

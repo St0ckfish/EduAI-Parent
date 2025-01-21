@@ -37,7 +37,7 @@ const Grades = () => {
   );
 
   // Translation logic
-  const { language } = useLanguageStore();
+  const language = useLanguageStore((state) => state.language);
   const t = (key: string) => {
     const translations: Record<string, Record<string, string>> = {
       selectAcademicYear: {

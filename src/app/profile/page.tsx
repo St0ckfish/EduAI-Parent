@@ -31,7 +31,7 @@ const EditProfile = () => {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<"MALE" | "FEMALE">("MALE");
 
-  const { language } = useLanguageStore();
+  const language = useLanguageStore((state) => state.language);
 
   const translate = (en: string, fr: string, ar: string) => {
     return language === "fr" ? fr : language === "ar" ? ar : en;

@@ -33,7 +33,7 @@ const Finance = () => {
         return 0;
       })
     : [];
-    const { language } = useLanguageStore();
+    const language = useLanguageStore((state) => state.language);
 
   return (
     <Container>

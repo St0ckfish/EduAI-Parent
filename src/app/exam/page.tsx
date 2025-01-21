@@ -24,7 +24,7 @@ const Exam = () => {
   const handleSelectExam = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStudentId(event.target.value);
   };
-  const { language } = useLanguageStore();
+  const language = useLanguageStore((state) => state.language);
 
   const translate = (en: string, fr: string, ar: string) => {
     return language === 'fr' ? fr : language === 'ar' ? ar : en;
