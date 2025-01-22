@@ -43,7 +43,7 @@ const Finance = () => {
           value={selectedStudent ?? ""}
           onValueChange={setSelectedStudent}
         >
-          <SelectTrigger className={`w-full border border-[#f0efef] bg-white`}>
+          <SelectTrigger className={`w-full border border-borderPrimary bg-bgPrimary`}>
             <SelectValue placeholder={
               language === 'fr'
                 ? 'Sélectionner un étudiant'
@@ -56,6 +56,7 @@ const Finance = () => {
             <SelectContent>
               {students?.data?.map((student: any) => (
                 <SelectItem
+                className="hover:bg-bgSecondary"
                   key={student.studentId}
                   value={student.studentId.toString()}
                 >

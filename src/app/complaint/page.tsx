@@ -174,7 +174,7 @@ const Complaint = () => {
               </div>
             </div>
             <div className="mt-[2px]">
-              <AiOutlineDown size={20} className="text-textSecondary" />
+              
             </div>
           </div>
         ))}

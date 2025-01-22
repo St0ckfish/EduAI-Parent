@@ -250,7 +250,7 @@ const Bus: React.FC = () => {
     <div className="bg-bgPrimary rounded-lg shadow-lg p-6">
       <div className="flex items-center gap-3 mb-6">
         <BusIcon className="w-8 h-8 text-blue-600" />
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-3xl font-bold text-textSecondary">
           {language === 'fr' 
             ? 'Suivi de localisation des bus'
             : language === 'ar' 
