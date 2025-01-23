@@ -157,7 +157,7 @@ const FollowUp = () => {
           value={selectedStudent ?? ""} 
           onValueChange={setSelectedStudent}
         >
-          <SelectTrigger className={`w-[250px] border bg-white border-[#f0efef]`}>
+          <SelectTrigger className={`w-[250px] border bg-bgPrimary border-border`}>
             <SelectValue placeholder="Select Student" />
           </SelectTrigger>
           {students?.data?.length && (
