@@ -1,10 +1,8 @@
 "use client";
 import Container from "~/_components/Container";
 import {
-  FaEllipsisH,
   FaRegComment,
   FaRegHeart,
-  FaPaperPlane,
 } from "react-icons/fa";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { IoSend } from "react-icons/io5";

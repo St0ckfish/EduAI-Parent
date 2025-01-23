@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { MdEdit } from "react-icons/md";
 import useLanguageStore from "~/APIs/store";
+import ImageComponent from "~/_components/ImageSrc";
 
 const EditProfile = () => {
   const router = useRouter();
@@ -161,8 +162,10 @@ const EditProfile = () => {
           </Text>
           <div className="mt-4 flex flex-col items-center">
             <div className="relative">
-              <img
-                src={preview ?? data?.data?.picture ?? "/images/userr.png"}
+            <ImageComponent
+        fallbackSrc="/images/noImage.png"
+        priority={true}
+                src={data?.data?.picture}
                 alt={translate("Profile Photo", "Photo de profil", "الصورة الشخصية")}
                 width={100}
                 height={100}
