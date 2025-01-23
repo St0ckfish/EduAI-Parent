@@ -165,7 +165,7 @@ const EditProfile = () => {
             <ImageComponent
         fallbackSrc="/images/noImage.png"
         priority={true}
-                src={data?.data?.picture}
+                src={data?.data?.picture ?? null} 
                 alt={translate("Profile Photo", "Photo de profil", "الصورة الشخصية")}
                 width={100}
                 height={100}
