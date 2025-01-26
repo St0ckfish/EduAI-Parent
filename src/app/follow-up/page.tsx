@@ -22,6 +22,7 @@ import {
 import { useGetAllStudents } from "~/APIs/hooks/useGrades";
 import { useStudentUpcomingEvents } from "~/APIs/hooks/useEvents";
 import Spinner from "~/_components/Spinner";
+import { useGetAttendance, useGetDailyPlan, useGetGPA } from "~/APIs/hooks/useExam";
 
 const FollowUp = () => {
   const { control } = useForm({
@@ -42,6 +43,9 @@ const FollowUp = () => {
   const [selectedGrade, setSelectedGrade] = useState<string>("mathematics");
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const { data, isLoading } = useStudentUpcomingEvents(selectedStudent ?? "")
+  const { data: Gpa, isLoading: isGpa } = useGetGPA(selectedStudent ?? "")
+  const { data: attend, isLoading: isAttend } = useGetAttendance(selectedStudent ?? "")
+  const { data: daily, isLoading: isDaily } = useGetDailyPlan(selectedStudent ?? "")
   const { data: students, isLoading: isStudents } = useGetAllStudents();
   const subjects = [
     {
@@ -213,8 +217,8 @@ const FollowUp = () => {
                 Daily plan
               </Text>
               <div className="mt-4 flex gap-2">
-                <Text font={"bold"} color={"success"} size={"xl"}>
-                  95%
+                <Text font={"bold"} color={daily?.daily > 0 ? "success" : "error"} size={"xl"}>
+                  {daily?.daily}%
                 </Text>
                 <div className="mt-1">
                   <Image
@@ -228,7 +232,10 @@ const FollowUp = () => {
             </div>
             <div className="flex gap-1">
               <Text color={"primary"} font={"semiBold"}>
-                <Link href={"/dailyplan"}>Show details</Link>
+                {
+                  selectedStudent === null ? "Select Student" : 
+                <Link href={`/follow-up/${selectedStudent}`}>Show details</Link>
+                }
               </Text>
               <RiArrowRightSLine className="text-primary" size={25} />
             </div>
@@ -273,23 +280,13 @@ const FollowUp = () => {
           <BoxGrid className="mt-4">
             <Box shadow="md">
               <Text color={"gray"}>GPA</Text>
-              <Text font={"semiBold"}>5.8</Text>
-              <Text color={"success"}>+1.3</Text>
+              <Text font={"semiBold"}>{Gpa?.currentGpa}</Text>
+              <Text color={Gpa?.percentageDifference > 0 ? "success" : "error"}>{Gpa?.percentageDifference}</Text>
             </Box>
             <Box shadow="md">
               <Text color={"gray"}>Attendance</Text>
-              <Text font={"semiBold"}>84%</Text>
-              <Text color={"error"}>-3%</Text>
-            </Box>
-            <Box shadow="md">
-              <Text color={"gray"}>Class Participation</Text>
-              <Text font={"semiBold"}>Good</Text>
-              <Text color={"success"}>+3</Text>
-            </Box>
-            <Box shadow="md">
-              <Text color={"gray"}>Student Behavior</Text>
-              <Text font={"semiBold"}>Good</Text>
-              <Text color={"success"}>+4</Text>
+              <Text font={"semiBold"}>{attend?.currentAttendance}%</Text>
+              <Text color={attend?.percentageDifference > 0 ? "success" : "error"}>{attend?.percentageDifference}%</Text>
             </Box>
           </BoxGrid>
         </Box>
