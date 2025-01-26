@@ -303,10 +303,10 @@ const FollowUp = () => {
           <Text font={"bold"} size={"xl"}>
             Grade Book
           </Text>
-          <div className="flex w-full flex-col lg:flex-row justify-center md:justify-start items-center md:items-start gap-8 rounded-xl bg-bgPrimary p-8">
+          <div className="flex w-full shadow-lg flex-col lg:flex-row justify-center md:justify-start items-center md:items-start gap-8 rounded-xl bg-bgPrimary p-8">
             <div className="w-full lg:w-1/5">
               <RadioGroup.Root
-                className="gap-4"
+                className="gap-4 shadow-lg rounded-lg"
                 value={selectedGrade}
                 onValueChange={handleGradeChange}
                 aria-label="Grade Selection"
