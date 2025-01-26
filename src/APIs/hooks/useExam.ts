@@ -4,7 +4,7 @@ import type {
   UseQueryOptions,
 } from "@tanstack/react-query";
 import type { AttemptAnswersResponse, DailyExamAttemptsResponse, DailyExamResponse, ExamFormData, ExamListResponse, ExamResultsResponse, Upcoming_Previous_Exams, UpcomingExamByIdResponse } from "../../types";
-import { createExam, fetchAllExams, fetchAllPreviousExams, fetchAllUpcomingExams, fetchAttemptAnswers, fetchDailyExamAttempts, fetchDailyExamDataByStudentId, fetchExamResults, fetchPreviousExamsByStudentId, fetchUpcomingExamsByStudentId, getAttendance, getDailyPlan, getGPA, putGrade } from "../features/exam";
+import { createExam, fetchAllExams, fetchAllPreviousExams, fetchAllUpcomingExams, fetchAttemptAnswers, fetchDailyExamAttempts, fetchDailyExamDataByStudentId, fetchExamResults, fetchPreviousExamsByStudentId, fetchUpcomingExamsByStudentId, getAttendance, getDailyPlan, getGPA, getStudentById, putGrade } from "../features/exam";
 
 export const useGetAllExams = (
   options?: UseQueryOptions<ExamListResponse, Error>,
@@ -58,6 +58,18 @@ export const useGetDailyPlan = (
   return useQuery<any, Error>({
     queryKey: ["da", studentId],
     queryFn: () => getDailyPlan(studentId),
+    staleTime: 1000 * 60 * 5,
+    enabled: !!studentId,
+    ...options,
+  });
+};
+export const useGetStudentById = (
+  studentId: string,
+  options?: UseQueryOptions<any, Error>,
+) => {
+  return useQuery<any, Error>({
+    queryKey: ["studentById", studentId],
+    queryFn: () => getStudentById(studentId),
     staleTime: 1000 * 60 * 5,
     enabled: !!studentId,
     ...options,

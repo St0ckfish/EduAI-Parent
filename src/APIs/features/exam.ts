@@ -31,6 +31,12 @@ export const getDailyPlan = async (studentId: string): Promise<any> => {
     );
     return response.data;
 };
+export const getStudentById = async (studentId: string): Promise<any> => {
+    const response = await axiosInstance.get<any>(
+        `/api/v1/management/student/${studentId}/update`
+    );
+    return response.data;
+};
 export const fetchAllPreviousExams = async (): Promise<Upcoming_Previous_Exams> => {
     const response = await axiosInstance.get<Upcoming_Previous_Exams>(
         `/api/v1/academic/educationalAffairs/exams/previous`

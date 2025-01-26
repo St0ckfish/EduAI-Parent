@@ -183,31 +183,37 @@ const FollowUp = () => {
       </div>
 
       <BoxGrid>
-        <Box>
+      <Box>
           <div className="flex justify-between">
-            <div className="flex gap-6">
-              <div>
-                <Image
-                  src={"/images/userr.png"}
-                  alt="student Photo"
-                  width={75}
-                  height={75}
-                />
-              </div>
-              <div>
-                <Text font={"bold"} size={"xl"}>
-                  Khadija Yassine Hamdallah
-                </Text>
-                <Text color={"gray"} font={"semiBold"} className="mt-4">
-                  @khadija_yassine
-                </Text>
-              </div>
-            </div>
-            <div>
-              <Text font={"bold"} color={"gray"}>
-                Grade 5
-              </Text>
-            </div>
+            {selectedStudent === null ? (
+              <Text>Select Student</Text>
+            ) : (
+              <>
+                <div className="flex gap-6">
+                  <div>
+                    <Image
+                      src={"/images/userr.png"}
+                      alt="student Photo"
+                      width={75}
+                      height={75}
+                    />
+                  </div>
+                  <div>
+                    <Text font={"bold"} size={"xl"}>
+                      {students?.data?.find((student: any) => student.studentId.toString() === selectedStudent)?.name}
+                    </Text>
+                    <Text color={"gray"} font={"semiBold"} className="mt-4">
+                      @{students?.data?.find((student: any) => student.studentId.toString() === selectedStudent)?.name.toLowerCase().replace(/\s+/g, '_')}
+                    </Text>
+                  </div>
+                </div>
+                <div>
+                  <Text font={"bold"} color={"gray"}>
+                    {students?.data?.find((student: any) => student.studentId.toString() === selectedStudent)?.grade}
+                  </Text>
+                </div>
+              </>
+            )}
           </div>
         </Box>
         <Box>
