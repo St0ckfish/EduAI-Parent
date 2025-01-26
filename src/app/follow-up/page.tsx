@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { useGetAllStudents } from "~/APIs/hooks/useGrades";
+import { useStudentUpcomingEvents } from "~/APIs/hooks/useEvents";
+import Spinner from "~/_components/Spinner";
 
 const FollowUp = () => {
   const { control } = useForm({
@@ -39,7 +41,7 @@ const FollowUp = () => {
 
   const [selectedGrade, setSelectedGrade] = useState<string>("mathematics");
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
-  
+  const { data, isLoading } = useStudentUpcomingEvents(selectedStudent ?? "")
   const { data: students, isLoading: isStudents } = useGetAllStudents();
   const subjects = [
     {
@@ -153,22 +155,22 @@ const FollowUp = () => {
     <Container>
       <div className="mb-8 flex gap-4 justify-between">
         <div>
-        <Select 
-          value={selectedStudent ?? ""} 
-          onValueChange={setSelectedStudent}
-        >
-          <SelectTrigger className={`w-[250px] border bg-bgPrimary border-border`}>
-            <SelectValue placeholder="Select Student" />
-          </SelectTrigger>
-          {students?.data?.length && (
-          <SelectContent>
-            {students?.data?.map((student:any)=>(
-              <SelectItem key={student.studentId} value={student.studentId.toString()}>
-                {student.name}
-              </SelectItem>
-            ))}
-          </SelectContent>)}
-        </Select>
+          <Select
+            value={selectedStudent ?? ""}
+            onValueChange={setSelectedStudent}
+          >
+            <SelectTrigger className={`w-[250px] border bg-bgPrimary border-border`}>
+              <SelectValue placeholder="Select Student" />
+            </SelectTrigger>
+            {students?.data?.length && (
+              <SelectContent>
+                {students?.data?.map((student: any) => (
+                  <SelectItem key={student.studentId} value={student.studentId.toString()}>
+                    {student.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>)}
+          </Select>
         </div>
 
         <div>
@@ -236,36 +238,30 @@ const FollowUp = () => {
           <Text font={"bold"} size={"xl"}>
             Upcoming Events
           </Text>
-          <div className="mt-4 flex justify-between border-l-4 border-warning p-4">
-            <div>
-              <Text>Art Day</Text>
-              <Text color={"gray"}>Tomorrow</Text>
-            </div>
-            <div className="flex flex-col items-end">
-              <Text>2:00 PM</Text>
-              <Text>21 may,2024</Text>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-between border-l-4 border-info p-4">
-            <div>
-              <Text>Art Day</Text>
-              <Text color={"gray"}>Tomorrow</Text>
-            </div>
-            <div className="flex flex-col items-end">
-              <Text>2:00 PM</Text>
-              <Text>21 may,2024</Text>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-between border-l-4 border-warning p-4">
-            <div>
-              <Text>Art Day</Text>
-              <Text color={"gray"}>Tomorrow</Text>
-            </div>
-            <div className="flex flex-col items-end">
-              <Text>2:00 PM</Text>
-              <Text>21 may,2024</Text>
-            </div>
-          </div>
+          {
+            isLoading ? <Spinner /> :
+              <>
+                {
+                  !data?.data?.content?.length ? <div className="mt-4 flex justify-between border-l-4 border-info p-4">
+                    {selectedStudent === null ? "Select Student" :
+                      "There are no Upcoming Events"
+                    }
+                  </div> :
+                    data?.data?.content.map((event: any) => (
+                      <div key={event.id} className="mt-4 flex justify-between border-l-4 border-info p-4">
+                        <div>
+                          <Text>Art Day</Text>
+                          <Text color={"gray"}>Tomorrow</Text>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <Text>2:00 PM</Text>
+                          <Text>21 may,2024</Text>
+                        </div>
+                      </div>
+                    ))
+                }
+              </>
+          }
         </Box>
         <Box>
           <Text font={"bold"} size={"xl"}>
