@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Client, type Frame, type Message } from '@stomp/stompjs';
 import { MapContainer, TileLayer, Popup, useMapEvents, Marker } from 'react-leaflet';
@@ -11,6 +12,9 @@ import useLanguageStore, { useUserDataStore } from '~/APIs/store';
 import Container from '~/_components/Container';
 import 'leaflet/dist/leaflet.css';
 
+// ============================
+// Type Definitions
+// ============================
 interface FormData {
   busId: string;
   longitude: number;
@@ -40,7 +44,45 @@ interface RawBusData {
   };
 }
 
-// Custom marker icon component
+// ============================
+// ReverseGeocode Component
+// ============================
+
+interface ReverseGeocodeProps {
+  lat: number;
+  lng: number;
+}
+
+const ReverseGeocode: React.FC<ReverseGeocodeProps> = ({ lat, lng }) => {
+  const [country, setCountry] = useState<string>('Loading...');
+
+  useEffect(() => {
+    const fetchCountry = async () => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+        );
+        const data = await response.json();
+        if (data.address && data.address.country) {
+          setCountry(data.address.country);
+        } else {
+          setCountry('Unknown');
+        }
+      } catch (error) {
+        console.error("Error fetching country:", error);
+        setCountry('Unknown');
+      }
+    };
+
+    fetchCountry();
+  }, [lat, lng]);
+
+  return <span>{country}</span>;
+};
+
+// ============================
+// Custom Marker Icon Component
+// ============================
 const createCustomMarkerIcon = (color: string) => {
   const iconHtml = renderToString(
     <div className="relative">
@@ -58,7 +100,9 @@ const createCustomMarkerIcon = (color: string) => {
   });
 };
 
-// Location marker component
+// ============================
+// Location Marker Component
+// ============================
 const LocationMarker: React.FC<{
   onLocationSelect: (lat: number, lng: number) => void;
   position: [number, number] | null;
@@ -76,6 +120,9 @@ const LocationMarker: React.FC<{
   ) : null;
 };
 
+// ============================
+// Bus Component
+// ============================
 const Bus: React.FC = () => {
   const [connected, setConnected] = useState<boolean>(false);
   const [messages, setMessages] = useState<BusLocation[]>([]);
@@ -86,7 +133,6 @@ const Bus: React.FC = () => {
   });
   const [stompClient, setStompClient] = useState<Client | null>(null);
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
-  // New state to hold the notification data (set once on connect)
   const [notification, setNotification] = useState<NotificationData | null>(null);
 
   const token = Cookies.get('token');
@@ -94,10 +140,10 @@ const Bus: React.FC = () => {
   const userId = userData.id;
   const language = useLanguageStore((state) => state.language);
 
-  // Map default position
+  // Default map position
   const defaultPosition: [number, number] = [29.261243, -9.873053];
 
-  // Handle location selection on map
+  // Handle map click to select location
   const handleLocationSelect = (lat: number, lng: number) => {
     setMarkerPosition([lat, lng]);
     setFormData((prev) => ({
@@ -137,7 +183,7 @@ const Bus: React.FC = () => {
         // Subscribe to user notifications
         client.subscribe(`/user/${userId}/notifications`, (message: Message) => {
           const rawData: NotificationData = JSON.parse(message.body);
-          // Set the notification state only if it has not been set yet
+          // Set notification only if not set already
           setNotification((current) => current || rawData);
           console.log('Notification received at:', rawData.timestamp);
         });
@@ -165,7 +211,7 @@ const Bus: React.FC = () => {
     };
   }, [userId, token, formData.busId]);
 
-  // Connection handlers
+  // Connect/Disconnect handlers
   const connect = useCallback(() => {
     if (stompClient) {
       stompClient.activate();
@@ -180,7 +226,7 @@ const Bus: React.FC = () => {
     }
   }, [stompClient]);
 
-  // Form input handler
+  // Form input change handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -189,7 +235,7 @@ const Bus: React.FC = () => {
     }));
   };
 
-  // Send location data
+  // Send location update via WebSocket
   const sendData = useCallback(() => {
     if (!formData.busId || !formData.longitude || !formData.latitude) {
       alert("Please fill all fields and select a location on the map!");
@@ -217,13 +263,12 @@ const Bus: React.FC = () => {
     }
   }, [stompClient, formData]);
 
-  // Message handling
+  // Add a new location update message
   const addMessage = (data: BusLocation) => {
     setMessages((prev) => [...prev, data]);
   };
 
-  // (Optional) Request notification permission if you want to use browser notifications.
-  // You can remove this useEffect if you no longer need system notifications.
+  // (Optional) Request browser notification permission
   useEffect(() => {
     if (Notification.permission === "default") {
       void Notification.requestPermission().then((permission) => {
@@ -282,7 +327,7 @@ const Bus: React.FC = () => {
             </button>
           </div>
 
-          {/* Notification panel: displays the timestamp, title, and description once (after socket connect) */}
+          {/* Notification panel */}
           {notification && (
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <h2 className="text-xl font-bold">{notification.title}</h2>
@@ -366,10 +411,11 @@ const Bus: React.FC = () => {
                       )}
                       <div className="text-gray-600 pl-6">
                         {language === 'fr'
-                          ? `Longitude : ${msg.longitude.toFixed(6)}\nLatitude : ${msg.latitude.toFixed(6)}`
+                          ? 'Pays: '
                           : language === 'ar'
-                          ? `الخط الطولي: ${msg.longitude.toFixed(6)}\nالعرض: ${msg.latitude.toFixed(6)}`
-                          : `Longitude: ${msg.longitude.toFixed(6)}\nLatitude: ${msg.latitude.toFixed(6)}`}
+                          ? 'البلد: '
+                          : 'Country: '}
+                        <ReverseGeocode lat={msg.latitude} lng={msg.longitude} />
                       </div>
                     </div>
                   ))}
