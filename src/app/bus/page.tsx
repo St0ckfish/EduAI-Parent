@@ -54,30 +54,46 @@ interface ReverseGeocodeProps {
 }
 
 const ReverseGeocode: React.FC<ReverseGeocodeProps> = ({ lat, lng }) => {
-  const [country, setCountry] = useState<string>('Loading...');
+  const [fullAddress, setFullAddress] = useState<string>('Loading address...');
 
   useEffect(() => {
-    const fetchCountry = async () => {
+    const fetchAddress = async () => {
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
         );
         const data = await response.json();
-        if (data.address && data.address.country) {
-          setCountry(data.address.country);
+
+        if (data.address) {
+          const addressData = data.address;
+          // Build street: combine house_number and road if available.
+          const street = addressData.house_number && addressData.road
+            ? `${addressData.house_number} ${addressData.road}`
+            : addressData.road || '';
+          // For city, try multiple keys (city, town, village, municipality)
+          const city = addressData.city || addressData.town || addressData.village || addressData.municipality || '';
+          const country = addressData.country || '';
+
+          // Create full address string; adjust the format as desired.
+          const addressParts: string[] = [];
+          if (street) addressParts.push(street);
+          if (city) addressParts.push(city);
+          if (country) addressParts.push(country);
+
+          setFullAddress(addressParts.join(', ') || 'Unknown');
         } else {
-          setCountry('Unknown');
+          setFullAddress('Unknown');
         }
       } catch (error) {
-        console.error("Error fetching country:", error);
-        setCountry('Unknown');
+        console.error("Error fetching address:", error);
+        setFullAddress('Unknown');
       }
     };
 
-    fetchCountry();
+    fetchAddress();
   }, [lat, lng]);
 
-  return <span>{country}</span>;
+  return <span>{fullAddress}</span>;
 };
 
 // ============================
@@ -411,10 +427,10 @@ const Bus: React.FC = () => {
                       )}
                       <div className="text-gray-600 pl-6">
                         {language === 'fr'
-                          ? 'Pays: '
+                          ? 'Adresse: '
                           : language === 'ar'
-                          ? 'البلد: '
-                          : 'Country: '}
+                          ? 'العنوان: '
+                          : 'Address: '}
                         <ReverseGeocode lat={msg.latitude} lng={msg.longitude} />
                       </div>
                     </div>
