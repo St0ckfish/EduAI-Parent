@@ -2,37 +2,25 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Client, type Frame, type Message } from '@stomp/stompjs';
-import { MapContainer, TileLayer, Popup, useMapEvents, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, Popup, Marker, Polyline } from 'react-leaflet';
 import { MapPin, Bus as BusIcon } from 'lucide-react';
 import { divIcon } from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import Cookies from 'js-cookie';
 import { baseUrlStock } from '~/APIs/axios';
-import useLanguageStore, { useUserDataStore } from '~/APIs/store';
+import useLanguageStore from '~/APIs/store';
 import Container from '~/_components/Container';
 import 'leaflet/dist/leaflet.css';
+import polyline from '@mapbox/polyline';
 
 // ============================
 // Type Definitions
 // ============================
-interface FormData {
-  busId: string;
-  longitude: number;
-  latitude: number;
-}
-
 interface BusLocation {
   message?: string;
   busId: number;
   longitude: number;
   latitude: number;
-}
-
-interface NotificationData {
-  id: number;
-  title: string;
-  description: string;
-  timestamp: number;
 }
 
 interface RawBusData {
@@ -45,59 +33,7 @@ interface RawBusData {
 }
 
 // ============================
-// ReverseGeocode Component
-// ============================
-
-interface ReverseGeocodeProps {
-  lat: number;
-  lng: number;
-}
-
-const ReverseGeocode: React.FC<ReverseGeocodeProps> = ({ lat, lng }) => {
-  const [fullAddress, setFullAddress] = useState<string>('Loading address...');
-
-  useEffect(() => {
-    const fetchAddress = async () => {
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-        );
-        const data = await response.json();
-
-        if (data.address) {
-          const addressData = data.address;
-          // Build street: combine house_number and road if available.
-          const street = addressData.house_number && addressData.road
-            ? `${addressData.house_number} ${addressData.road}`
-            : addressData.road || '';
-          // For city, try multiple keys (city, town, village, municipality)
-          const city = addressData.city || addressData.town || addressData.village || addressData.municipality || '';
-          const country = addressData.country || '';
-
-          // Create full address string; adjust the format as desired.
-          const addressParts: string[] = [];
-          if (street) addressParts.push(street);
-          if (city) addressParts.push(city);
-          if (country) addressParts.push(country);
-
-          setFullAddress(addressParts.join(', ') || 'Unknown');
-        } else {
-          setFullAddress('Unknown');
-        }
-      } catch (error) {
-        console.error("Error fetching address:", error);
-        setFullAddress('Unknown');
-      }
-    };
-
-    fetchAddress();
-  }, [lat, lng]);
-
-  return <span>{fullAddress}</span>;
-};
-
-// ============================
-// Custom Marker Icon Component
+// Custom Marker Icon
 // ============================
 const createCustomMarkerIcon = (color: string) => {
   const iconHtml = renderToString(
@@ -117,59 +53,42 @@ const createCustomMarkerIcon = (color: string) => {
 };
 
 // ============================
-// Location Marker Component
-// ============================
-const LocationMarker: React.FC<{
-  onLocationSelect: (lat: number, lng: number) => void;
-  position: [number, number] | null;
-}> = ({ onLocationSelect, position }) => {
-  useMapEvents({
-    click(e) {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-    },
-  });
-
-  return position ? (
-    <Marker position={position} icon={createCustomMarkerIcon('#e84743')}>
-      <Popup>Selected Location</Popup>
-    </Marker>
-  ) : null;
-};
-
-// ============================
 // Bus Component
 // ============================
 const Bus: React.FC = () => {
+  // STOMP connection and location states
   const [connected, setConnected] = useState<boolean>(false);
-  const [messages, setMessages] = useState<BusLocation[]>([]);
-  const [formData, setFormData] = useState<FormData>({
-    busId: '',
-    longitude: 0,
-    latitude: 0,
-  });
+  const [busId, setBusId] = useState<string>("1");
+  const [busLocation, setBusLocation] = useState<[number, number] | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
+  const [routePoints, setRoutePoints] = useState<Array<[number, number]>>([]);
   const [stompClient, setStompClient] = useState<Client | null>(null);
-  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
-  const [notification, setNotification] = useState<NotificationData | null>(null);
 
   const token = Cookies.get('token');
-  const userData = useUserDataStore.getState().userData;
-  const userId = userData.id;
   const language = useLanguageStore((state) => state.language);
 
-  // Default map position
-  const defaultPosition: [number, number] = [29.261243, -9.873053];
+  // ----------------------------
+  // 1. Get User's Current Location
+  // ----------------------------
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentLocation([position.coords.latitude, position.coords.longitude]);
+          console.log("Current location:", position.coords.latitude, position.coords.longitude);
+        },
+        (error) => {
+          console.error("Error getting current location:", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  }, []);
 
-  // Handle map click to select location
-  const handleLocationSelect = (lat: number, lng: number) => {
-    setMarkerPosition([lat, lng]);
-    setFormData((prev) => ({
-      ...prev,
-      latitude: lat,
-      longitude: lng,
-    }));
-  };
-
-  // Initialize WebSocket connection and subscriptions
+  // ----------------------------
+  // 2. Connect via STOMP and subscribe to bus location updates
+  // ----------------------------
   useEffect(() => {
     const client = new Client({
       brokerURL: `${baseUrlStock}ws?token=${token}`,
@@ -181,11 +100,10 @@ const Bus: React.FC = () => {
 
     client.onConnect = (frame: Frame) => {
       setConnected(true);
-      console.log('Connected: ' + JSON.stringify(frame));
+      console.log('Connected:', frame);
 
       try {
-        // Subscribe to bus location updates
-        client.subscribe(`/topic/bus-location/${formData.busId}`, (message: Message) => {
+        client.subscribe(`/topic/bus-location/${busId}`, (message: Message) => {
           const rawData: RawBusData = JSON.parse(message.body);
           const data: BusLocation = {
             message: rawData.message,
@@ -193,20 +111,12 @@ const Bus: React.FC = () => {
             longitude: rawData.data.longitude,
             latitude: rawData.data.latitude,
           };
-          addMessage(data);
+          // Update bus location state with [latitude, longitude]
+          setBusLocation([data.latitude, data.longitude]);
+          console.log("Received bus location:", data.latitude, data.longitude);
         });
-
-        // Subscribe to user notifications
-        client.subscribe(`/user/${userId}/notifications`, (message: Message) => {
-          const rawData: NotificationData = JSON.parse(message.body);
-          // Set notification only if not set already
-          setNotification((current) => current || rawData);
-          console.log('Notification received at:', rawData.timestamp);
-        });
-
-        console.log("Subscribed successfully");
       } catch (error) {
-        console.error('Error in subscriptions:', error);
+        console.error('Error in subscription:', error);
       }
     };
 
@@ -219,79 +129,75 @@ const Bus: React.FC = () => {
     };
 
     setStompClient(client);
+    client.activate();
 
     return () => {
       if (client.connected) {
-        void client.deactivate();
+        client.deactivate();
       }
     };
-  }, [userId, token, formData.busId]);
+  }, [busId, token]);
 
-  // Connect/Disconnect handlers
+  // ----------------------------
+  // 3. Fetch Route from Current Location to Bus Location
+  // ----------------------------
+  useEffect(() => {
+    if (!currentLocation || !busLocation) return;
+
+    const fetchRoute = async () => {
+      // API key and URL for LocationIQ Directions API
+      const apiKey = 'pk.d807ad8f5a3c9654c978548059f91986';
+      const [startLat, startLng] = currentLocation;
+      const [destLat, destLng] = busLocation;
+      const url = `https://us1.locationiq.com/v1/directions/driving/${startLng},${startLat};${destLng},${destLat}?key=${apiKey}&geometries=polyline`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Failed to fetch route");
+        }
+        const data = await response.json();
+        const polylineString = data.routes[0].geometry;
+        // Decode the polyline string into an array of [lat, lng] points
+        const decodedPoints: [number, number][] = polyline
+          .decode(polylineString)
+          .filter((point: number[]): point is [number, number] => 
+            point.length >= 2 && 
+            typeof point[0] === 'number' && 
+            typeof point[1] === 'number'
+          );
+        setRoutePoints(decodedPoints);
+        console.log(`Route updated with ${decodedPoints.length} points.`);
+      } catch (error) {
+        console.error("Error fetching route:", error);
+      }
+    };
+
+    fetchRoute();
+  }, [currentLocation, busLocation]);
+
+  // ----------------------------
+  // 4. Optional: Connect/Disconnect Handlers
+  // ----------------------------
   const connect = useCallback(() => {
-    if (stompClient) {
+    if (stompClient && !connected) {
       stompClient.activate();
     }
-  }, [stompClient]);
+  }, [stompClient, connected]);
 
   const disconnect = useCallback(() => {
-    if (stompClient) {
-      void stompClient.deactivate();
+    if (stompClient && connected) {
+      stompClient.deactivate();
       setConnected(false);
-      setMessages([]);
+      setBusLocation(null);
+      setRoutePoints([]);
     }
-  }, [stompClient]);
+  }, [stompClient, connected]);
 
-  // Form input change handler
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-  };
-
-  // Send location update via WebSocket
-  const sendData = useCallback(() => {
-    if (!formData.busId || !formData.longitude || !formData.latitude) {
-      alert("Please fill all fields and select a location on the map!");
-      return;
-    }
-
-    const data = {
-      busId: parseInt(formData.busId),
-      longitude: formData.longitude,
-      latitude: formData.latitude,
-    };
-
-    try {
-      if (!stompClient) {
-        throw new Error('STOMP client is not initialized');
-      }
-
-      stompClient.publish({
-        destination: "/app/update-location",
-        body: JSON.stringify(data),
-      });
-      console.log("Data sent successfully:", data);
-    } catch (error) {
-      console.error("Error during data sending:", error);
-    }
-  }, [stompClient, formData]);
-
-  // Add a new location update message
-  const addMessage = (data: BusLocation) => {
-    setMessages((prev) => [...prev, data]);
-  };
-
-  // (Optional) Request browser notification permission
-  useEffect(() => {
-    if (Notification.permission === "default") {
-      void Notification.requestPermission().then((permission) => {
-        console.log("Notification permission: ", permission);
-      });
-    }
-  }, []);
+  // ----------------------------
+  // 5. Render the Map
+  // ----------------------------
+  // Use current location if available; otherwise fall back to a default
+  const defaultPosition: [number, number] = currentLocation || [29.261243, -9.873053];
 
   return (
     <Container>
@@ -343,101 +249,61 @@ const Bus: React.FC = () => {
             </button>
           </div>
 
-          {/* Notification panel */}
-          {notification && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h2 className="text-xl font-bold">{notification.title}</h2>
-              <p>{notification.description}</p>
-              <p className="text-sm text-gray-600">
-                {new Date(notification.timestamp).toLocaleString()}
-              </p>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <BusIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  id="busId"
-                  className="w-full pl-10 border border-borderPrimary rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={
-                    language === 'fr'
-                      ? "Entrez l'ID du bus"
-                      : language === 'ar'
-                      ? 'أدخل معرف الحافلة'
-                      : 'Enter Bus ID'
-                  }
-                  value={formData.busId}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div className="h-96 rounded-lg overflow-hidden border border-gray-300">
-                <MapContainer center={defaultPosition} zoom={13} className="h-full w-full">
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  <LocationMarker onLocationSelect={handleLocationSelect} position={markerPosition} />
-                </MapContainer>
-              </div>
-
-              <button
-                className="w-full inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-                onClick={sendData}
-              >
-                <MapPin className="w-5 h-5" />
-                {language === 'fr'
-                  ? 'Mettre à jour la localisation'
+          {/* Bus ID input (optional; you can remove if not needed) */}
+          <div className="mb-4">
+            <input
+              type="text"
+              value={busId}
+              onChange={(e) => setBusId(e.target.value)}
+              className="w-full border border-borderPrimary rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={
+                language === 'fr'
+                  ? "Entrez l'ID du bus"
                   : language === 'ar'
-                  ? 'تحديث الموقع'
-                  : 'Update Location'}
-              </button>
-            </div>
+                  ? 'أدخل معرف الحافلة'
+                  : 'Enter Bus ID'
+              }
+            />
+          </div>
 
-            {connected && (
-              <div className="bg-bgSecondary rounded-lg p-4">
-                <h2 className="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-600" />
-                  {language === 'fr'
-                    ? 'Mises à jour de localisation'
-                    : language === 'ar'
-                    ? 'تحديثات الموقع'
-                    : 'Location Updates'}
-                </h2>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {messages.map((msg, index) => (
-                    <div key={index} className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                      <div className="font-medium text-gray-800 flex items-center gap-2">
-                        <BusIcon className="w-4 h-4 text-blue-600" />
-                        {language === 'fr'
-                          ? `ID de bus : ${msg.busId}`
-                          : language === 'ar'
-                          ? `رقم معرف الحافلة: ${msg.busId}`
-                          : `Bus ID: ${msg.busId}`}
-                      </div>
-                      {msg.message && (
-                        <div className="text-gray-600 pl-6 mb-2">
-                          {msg.message}
-                        </div>
-                      )}
-                      <div className="text-gray-600 pl-6">
-                        {language === 'fr'
-                          ? 'Adresse: '
-                          : language === 'ar'
-                          ? 'العنوان: '
-                          : 'Address: '}
-                        <ReverseGeocode lat={msg.latitude} lng={msg.longitude} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="h-96 rounded-lg overflow-hidden border border-gray-300">
+            <MapContainer center={defaultPosition} zoom={15} className="h-full w-full">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+
+              {/* Draw the route polyline if available */}
+              {routePoints.length > 0 && (
+                <Polyline positions={routePoints} color="blue" weight={4} />
+              )}
+
+              {/* Marker for the user's current location */}
+              {currentLocation && (
+                <Marker position={currentLocation} icon={createCustomMarkerIcon('#00ff00')}>
+                  <Popup>
+                    {language === 'fr'
+                      ? 'Votre position'
+                      : language === 'ar'
+                      ? 'موقعك'
+                      : 'Your Location'}
+                  </Popup>
+                </Marker>
+              )}
+
+              {/* Marker for the bus location */}
+              {busLocation && (
+                <Marker position={busLocation} icon={createCustomMarkerIcon('#ff0000')}>
+                  <Popup>
+                    {language === 'fr'
+                      ? 'Localisation du bus'
+                      : language === 'ar'
+                      ? 'موقع الحافلة'
+                      : 'Bus Location'}
+                  </Popup>
+                </Marker>
+              )}
+            </MapContainer>
           </div>
         </div>
       </div>
