@@ -186,7 +186,7 @@ const t = (key: string) => {
           value={selectedStudent ?? ""} 
           onValueChange={setSelectedStudent}
         >
-          <SelectTrigger className="w-[250px] border bg-white border-[#f0efef]">
+          <SelectTrigger className="w-[250px] border bg-bgPrimary border-[#f0efef]">
             <SelectValue placeholder={t("selectStudent")} />
           </SelectTrigger>
           {students?.data?.length && (
