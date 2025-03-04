@@ -408,7 +408,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="flex justify-between p-4">
+                      <div className="flex justify-between p-4 overflow-auto">
                         <div>
                           <Text>{event.title}</Text>
                           <Text color="gray">{event.description}</Text>
