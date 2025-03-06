@@ -1,6 +1,5 @@
 "use client";
 import Container from "~/_components/Container";
-import { AiOutlineDown } from "react-icons/ai";
 import { BsArrowDownLeft, BsArrowUpRight } from "react-icons/bs";
 import Input from "~/_components/Input";
 import { Text } from "~/_components/Text";
@@ -9,7 +8,7 @@ import {
   useGetAllComplains,
 } from "~/APIs/hooks/useComplains";
 import { type ComplaintResponse, type Student } from "~/types";
-import { useGetStudents, useGetStudentTeachers } from "~/APIs/hooks/useStudent";
+import { useGetStudentsSimpleData, useGetStudentTeachers } from "~/APIs/hooks/useStudent";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import Button from "~/_components/Button";
@@ -42,7 +41,7 @@ const Complaint = () => {
     data: dataStudents,
     error,
     isLoading: isStudentsLoading,
-  } = useGetStudents();
+  } = useGetStudentsSimpleData();
 
   const {
     data: dataStudentTeacher,
@@ -195,9 +194,9 @@ const Complaint = () => {
             <option value="">
               {translate("Select student", "Sélectionnez un étudiant", "اختر الطالب")}
             </option>
-            {dataStudents?.data.content?.map((student: Student) => (
+            {dataStudents?.data?.map((student: any) => (
               <option key={student.studentId} value={student.studentId}>
-                {student.studentName}
+                {student.name}
               </option>
             ))}
           </select>
