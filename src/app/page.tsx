@@ -44,8 +44,8 @@ export default function Home() {
         language === "ar"
           ? "تم تأكيد الحضور بنجاح!"
           : language === "fr"
-          ? "Présence confirmée avec succès!"
-          : "Attendance confirmed successfully!"
+            ? "Présence confirmée avec succès!"
+            : "Attendance confirmed successfully!"
       );
       void refetchEvents();
     },
@@ -54,20 +54,20 @@ export default function Home() {
         language === "ar"
           ? "خطأ في تأكيد الحضور!"
           : language === "fr"
-          ? "Erreur lors de la confirmation de la présence!"
-          : "Error confirming attendance!"
+            ? "Erreur lors de la confirmation de la présence!"
+            : "Error confirming attendance!"
       );
     },
   });
-  
+
   const { mutate: removeAttendance } = useRemoveAttendance({
     onSuccess: () => {
       toast.success(
         language === "ar"
           ? "تم إزالة الحضور بنجاح!"
           : language === "fr"
-          ? "Présence supprimée avec succès!"
-          : "Attendance removed successfully!"
+            ? "Présence supprimée avec succès!"
+            : "Attendance removed successfully!"
       );
       void refetchEvents();
     },
@@ -76,12 +76,12 @@ export default function Home() {
         language === "ar"
           ? "خطأ في إزالة الحضور!"
           : language === "fr"
-          ? "Erreur lors de la suppression de la présence!"
-          : "Error removing attendance!"
+            ? "Erreur lors de la suppression de la présence!"
+            : "Error removing attendance!"
       );
     },
   });
-  
+
 
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [comment, setComment] = useState("");
@@ -195,7 +195,7 @@ export default function Home() {
 
   return (
     <Container>
-      <div className="m-4 mb-4 flex flex-col items-start justify-between gap-4 md:flex-row">
+      <div className="m-4 mb-4 flex flex-col items-start justify-between gap-4 md:flex-row" dir={language === "ar" ? "rtl" : "ltr"}>
         <div className="flex w-full flex-col gap-4">
           {dataPosts?.data.content.map((post) => (
             <div key={post.id} className="w-full rounded-xl bg-bgPrimary p-4">
@@ -225,45 +225,44 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="mt-2 font-extrabold">
-                    
+
                   </div>
                 </div>
                 <Text className="m-2">{post.content}</Text>
                 <div className="mt-4">
                   {post?.attachments?.length > 0 && (
                     <div
-                      className={`grid gap-4 ${
-                        post?.attachments?.length === 1
+                      className={`grid gap-4 ${post?.attachments?.length === 1
                           ? "grid-cols-1"
                           : post?.attachments?.length === 2
                             ? "grid-cols-2"
                             : "grid-cols-2 md:grid-cols-3"
-                      }`}
+                        }`}
                     >
                       {" "}
                       {post.attachments.slice(0, 6).map((attachment, index) => (
                         <div key={index} className="relative">
-                                              <ImageComponent
-                        src={attachment.viewLink}
-                        fallbackSrc="/images/noImage.png"
-                        aspectRatio="aspect-video"
-                        objectFit="cover"
-                        priority={true}
-                        className="h-full w-full rounded-md object-cover"
-                        alt={`Post Image ${index + 1}`}
-                        onLoadingComplete={() => console.log('Image loaded')}
-                        onError={(error) => console.error('Image failed to load:', error)}
-                      />
+                          <ImageComponent
+                            src={attachment.viewLink}
+                            fallbackSrc="/images/noImage.png"
+                            aspectRatio="aspect-video"
+                            objectFit="cover"
+                            priority={true}
+                            className="h-full w-full rounded-md object-cover"
+                            alt={`Post Image ${index + 1}`}
+                            onLoadingComplete={() => console.log('Image loaded')}
+                            onError={(error) => console.error('Image failed to load:', error)}
+                          />
                         </div>
                       ))}
                       {post.attachments.length > 6 && (
                         <div className="relative flex items-center justify-center rounded-md bg-gray-200">
                           <Text font="bold" size="lg" className="text-primary">
                             +{post.attachments.length - 6}  {language === "ar"
-    ? "المزيد"
-    : language === "fr"
-    ? "plus"
-    : "more"}
+                              ? "المزيد"
+                              : language === "fr"
+                                ? "plus"
+                                : "more"}
                           </Text>
                         </div>
                       )}
@@ -332,12 +331,12 @@ export default function Home() {
 
                         {comments?.data.content.length === 0 && (
                           <Text color="gray" className="py-4 text-center">
-                          {language === "ar"
-                            ? "لا توجد تعليقات حتى الآن"
-                            : language === "fr"
-                            ? "Pas encore de commentaires"
-                            : "No comments yet"}
-                        </Text>
+                            {language === "ar"
+                              ? "لا توجد تعليقات حتى الآن"
+                              : language === "fr"
+                                ? "Pas encore de commentaires"
+                                : "No comments yet"}
+                          </Text>
                         )}
                       </>
                     )}
@@ -351,8 +350,8 @@ export default function Home() {
                           language === "ar"
                             ? "أضف تعليقًا..."
                             : language === "fr"
-                            ? "Ajouter un commentaire..."
-                            : "Add comment..."
+                              ? "Ajouter un commentaire..."
+                              : "Add comment..."
                         }
                         type="comment"
                         value={comment} // Set the input value to the state
@@ -372,13 +371,13 @@ export default function Home() {
         </div>
         <div className="w-full rounded-md bg-bgPrimary p-4 md:w-1/2">
           <div>
-          <Text font="bold" size="2xl">
-  {language === "ar"
-    ? "فعاليات اليوم"
-    : language === "fr"
-    ? "Événements d'aujourd'hui"
-    : "Today's Events"}
-</Text>
+            <Text font="bold" size="2xl">
+              {language === "ar"
+                ? "فعاليات اليوم"
+                : language === "fr"
+                  ? "Événements d'aujourd'hui"
+                  : "Today's Events"}
+            </Text>
 
             {todayEvents.length > 0 ? (
               todayEvents.map((event) => (
@@ -400,7 +399,7 @@ export default function Home() {
                             {new Date(event.startDate).toLocaleTimeString()} -{" "}
                             {Math.abs(
                               new Date(event.endDate).getTime() -
-                                new Date(event.startDate).getTime(),
+                              new Date(event.startDate).getTime(),
                             ) /
                               (1000 * 60)}{" "}
                             Min
@@ -421,11 +420,11 @@ export default function Home() {
                               }
                               color="secondary"
                             >
-                             {language === "ar"
-                         ? "تم تأكيد الحضور"
-                         : language === "fr"
-                         ? "Présence confirmée"
-                         : "Attendance Confirmed"}
+                              {language === "ar"
+                                ? "تم تأكيد الحضور"
+                                : language === "fr"
+                                  ? "Présence confirmée"
+                                  : "Attendance Confirmed"}
                             </Button>
                           ) : (
                             <Button
@@ -434,10 +433,10 @@ export default function Home() {
                               }
                             >
                               {language === "ar"
-                         ? "تأكيد الحضور"
-                         : language === "fr"
-                         ? "Confirmer la présence"
-                         : "Confirm Attendance"}
+                                ? "تأكيد الحضور"
+                                : language === "fr"
+                                  ? "Confirmer la présence"
+                                  : "Confirm Attendance"}
                             </Button>
                           )}
                         </div>
@@ -448,19 +447,19 @@ export default function Home() {
               ))
             ) : (
               <Text color="gray" font="semiBold" size="lg" className="m-2">
-  {language === "ar"
-    ? "لا توجد فعاليات مجدولة لليوم."
-    : language === "fr"
-    ? "Aucun événement prévu pour aujourd'hui."
-    : "No events scheduled for today."}
-</Text>
+                {language === "ar"
+                  ? "لا توجد فعاليات مجدولة لليوم."
+                  : language === "fr"
+                    ? "Aucun événement prévu pour aujourd'hui."
+                    : "No events scheduled for today."}
+              </Text>
             )}
           </div>
 
           <div className="my-2">
-          <Text font="bold" size="2xl">
-  {translate("Upcoming Events", "Événements à venir", "الأحداث القادمة")}
-</Text>
+            <Text font="bold" size="2xl">
+              {translate("Upcoming Events", "Événements à venir", "الأحداث القادمة")}
+            </Text>
             {upcomingEvents.length > 0 ? (
               upcomingEvents.map((event) => (
                 <div key={event.id} className="my-4">
@@ -481,7 +480,7 @@ export default function Home() {
                         {new Date(event.startDate).toLocaleTimeString()} -{" "}
                         {Math.abs(
                           new Date(event.endDate).getTime() -
-                            new Date(event.startDate).getTime(),
+                          new Date(event.startDate).getTime(),
                         ) /
                           (1000 * 60)}{" "}
                         Min
@@ -496,27 +495,27 @@ export default function Home() {
                     </div>
                     <div>
                       {event.isAttendee ? (
-                       <Button
-                       onClick={() => handleRemoveAttendance(event.id.toString())}
-                       color="secondary"
-                     >
-                       {language === "ar"
-                         ? "تم تأكيد الحضور"
-                         : language === "fr"
-                         ? "Présence confirmée"
-                         : "Attendance Confirmed"}
-                     </Button>
-                     ) : (
-                     <Button
-                       onClick={() => handleConfirmAttendance(event.id.toString())}
-                     >
-                       {language === "ar"
-                         ? "تأكيد الحضور"
-                         : language === "fr"
-                         ? "Confirmer la présence"
-                         : "Confirm Attendance"}
-                     </Button>
-                     
+                        <Button
+                          onClick={() => handleRemoveAttendance(event.id.toString())}
+                          color="secondary"
+                        >
+                          {language === "ar"
+                            ? "تم تأكيد الحضور"
+                            : language === "fr"
+                              ? "Présence confirmée"
+                              : "Attendance Confirmed"}
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => handleConfirmAttendance(event.id.toString())}
+                        >
+                          {language === "ar"
+                            ? "تأكيد الحضور"
+                            : language === "fr"
+                              ? "Confirmer la présence"
+                              : "Confirm Attendance"}
+                        </Button>
+
                       )}
                     </div>
                   </div>
@@ -524,12 +523,12 @@ export default function Home() {
               ))
             ) : (
               <Text color="gray" font="semiBold" size="lg" className="m-2">
-  {language === "ar"
-    ? "لا توجد فعاليات قادمة مجدولة."
-    : language === "fr"
-    ? "Aucun événement à venir programmé."
-    : "No upcoming events scheduled."}
-</Text>
+                {language === "ar"
+                  ? "لا توجد فعاليات قادمة مجدولة."
+                  : language === "fr"
+                    ? "Aucun événement à venir programmé."
+                    : "No upcoming events scheduled."}
+              </Text>
 
             )}
           </div>
