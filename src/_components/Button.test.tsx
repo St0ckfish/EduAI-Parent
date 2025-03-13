@@ -6,13 +6,16 @@ import Button from './Button';
 
 // Mock next/link
 jest.mock('next/link', () => {
-  return ({ href, children, ...rest }: any) => {
+  const MockLink = ({ href, children, ...rest }: any) => {
     return (
       <a href={href} {...rest}>
         {children}
       </a>
     );
   };
+
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 });
 
 describe('Button', () => {
