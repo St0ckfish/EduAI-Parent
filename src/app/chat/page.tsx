@@ -11,162 +11,162 @@ import { useCallback, useEffect, useState } from "react";
 import useLanguageStore, { useUserDataStore } from "~/APIs/store";
 import { Controller, useForm } from "react-hook-form";
 interface ChatData {
-    chatId: string;
-    lastMessage: string;
-    numberOfNewMessages: number;
-    targetUser: {
-      id: string;
-      name: string;
-      Role: string;
-      hasPhoto?: boolean;
-      photoLink?: string;
-    };
-  }
+  chatId: string;
+  lastMessage: string;
+  numberOfNewMessages: number;
+  targetUser: {
+    id: string;
+    name: string;
+    Role: string;
+    hasPhoto?: boolean;
+    photoLink?: string;
+  };
+}
 const Chat = () => {
-    const userData = useUserDataStore.getState().userData;
-    const [search, setSearch] = useState("");
-    const [userId, setUserId] = useState("");
-    const [realuserId, setRealUserId] = useState("");
-    const [userName, setUserNane] = useState("");
-    const [userRole, setUserRloe] = useState("");
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [isModalOpen2, setModalOpen2] = useState(false);
+  const userData = useUserDataStore.getState().userData;
+  const [search, setSearch] = useState("");
+  const [userId, setUserId] = useState("");
+  const [realuserId, setRealUserId] = useState("");
+  const [userName, setUserNane] = useState("");
+  const [userRole, setUserRloe] = useState("");
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalOpen2, setModalOpen2] = useState(false);
 
-    const {mutate: createChat} = useCreateNewChat();
-    const {mutate: deleteChat} = useDeleteChat();
-    const {data: users, isLoading: isGetting} = useAllUsersChat()
-    const {data, isLoading, refetch: regetusers} = useAllChats()
+  const { mutate: createChat } = useCreateNewChat();
+  const { mutate: deleteChat } = useDeleteChat();
+  const { data: users, isLoading: isGetting } = useAllUsersChat()
+  const { data, isLoading, refetch: regetusers } = useAllChats()
 
-    const optionsRigon =
+  const optionsRigon =
     users?.data?.content.map((user: { Role: any; id: any; name: any }) => ({
       value: user.id,
       label: `${user.name} - ${user.Role}`,
     })) || [];
-    
 
-    const handleDelete = (chatId: string) => {
-        deleteChat(
-          chatId,
-          {
-            onSuccess: () => {
-              regetusers();
-              setUserId("");
-            },
-            onError: (error) => {
-              console.error("Error deleting chat:", error);
-            }
-          }
-        );
-      };
-      const language = useLanguageStore((state) => state.language);
-      const onSubmit = (formData: { targetUserId: string }) => {
-        createChat(
-          { targetUserId: formData.targetUserId },
-          {
-            onSuccess: () => {
-              regetusers();
-              handleCloseModal();
-            },
-            onError: (error) => {
-              console.error("Error creating chat:", error);
-            }
-          }
-        );
-      };
 
-    const [localChats, setLocalChats] = useState(data?.data?.content || []);
-    const currentUserId = userData.id;
-
-    useEffect(() => {
-        if (data?.data?.content) {
-          setLocalChats(data.data.content);
+  const handleDelete = (chatId: string) => {
+    deleteChat(
+      chatId,
+      {
+        onSuccess: () => {
+          regetusers();
+          setUserId("");
+        },
+        onError: (error) => {
+          console.error("Error deleting chat:", error);
         }
-      }, [data]);
-    
-      const handleChatUpdate = useCallback((update: ChatData) => {
-        setLocalChats((prevChats: ChatData[]) => {
-          // Find if the chat already exists
-          const existingChatIndex = prevChats.findIndex(chat => chat.chatId === update.chatId);
-    
-          if (existingChatIndex === -1) {
-          return [update, ...prevChats];
-          }
-    
-          const updatedChats: ChatData[] = [...prevChats];
-          updatedChats[existingChatIndex] = {
-          ...updatedChats[existingChatIndex],
-          chatId: update.chatId,
-          lastMessage: update.lastMessage,
-          numberOfNewMessages: update.numberOfNewMessages,
-          targetUser: {
-            ...(updatedChats[existingChatIndex]?.targetUser ?? {}),
-            ...update.targetUser
-          }
-          };
-    
-          // Sort chats to bring the most recently updated chat to the top
-          return updatedChats.sort((a: ChatData, b: ChatData) => {
-          if (a.chatId === update.chatId) return -1;
-          if (b.chatId === update.chatId) return 1;
-          return 0;
-          });
-        });
-      }, []);
-
-      const clearNewMessages = useCallback((chatId: string) => {
-        setLocalChats((prevChats: ChatData[]) => 
-          prevChats.map((chat: ChatData): ChatData => 
-          chat.chatId === chatId 
-            ? { ...chat, numberOfNewMessages: 0 }
-            : chat
-          )
-        );
-      }, []);
-    
-      // Effect to clear new messages when a chat is selected
-      useEffect(() => {
-        if (userId) {
-          clearNewMessages(userId);
+      }
+    );
+  };
+  const language = useLanguageStore((state) => state.language);
+  const onSubmit = (formData: { targetUserId: string }) => {
+    createChat(
+      { targetUserId: formData.targetUserId },
+      {
+        onSuccess: () => {
+          regetusers();
+          handleCloseModal();
+        },
+        onError: (error) => {
+          console.error("Error creating chat:", error);
         }
-      }, [userId, clearNewMessages]);
+      }
+    );
+  };
 
-      const { isConnected } = useChatListSocket(currentUserId, handleChatUpdate);
-      
-      const handleOpenModal = () => {
-        setModalOpen(true);
-      };
-      const handleOpenModal2 = () => {
-        setModalOpen2(true);
-      };
-      const handleCloseModal = () => {
-        setModalOpen(false);
-      };
-      const handleCloseModal2 = () => {
-        setModalOpen2(false);
-      };
-      const handleClick = (id: string) => {
-        setUserId(id);
+  const [localChats, setLocalChats] = useState(data?.data?.content || []);
+  const currentUserId = userData.id;
+
+  useEffect(() => {
+    if (data?.data?.content) {
+      setLocalChats(data.data.content);
+    }
+  }, [data]);
+
+  const handleChatUpdate = useCallback((update: ChatData) => {
+    setLocalChats((prevChats: ChatData[]) => {
+      // Find if the chat already exists
+      const existingChatIndex = prevChats.findIndex(chat => chat.chatId === update.chatId);
+
+      if (existingChatIndex === -1) {
+        return [update, ...prevChats];
+      }
+
+      const updatedChats: ChatData[] = [...prevChats];
+      updatedChats[existingChatIndex] = {
+        ...updatedChats[existingChatIndex],
+        chatId: update.chatId,
+        lastMessage: update.lastMessage,
+        numberOfNewMessages: update.numberOfNewMessages,
+        targetUser: {
+          ...(updatedChats[existingChatIndex]?.targetUser ?? {}),
+          ...update.targetUser
+        }
       };
 
-      type FormData = {
-        targetUserId: string;
-      };
+      // Sort chats to bring the most recently updated chat to the top
+      return updatedChats.sort((a: ChatData, b: ChatData) => {
+        if (a.chatId === update.chatId) return -1;
+        if (b.chatId === update.chatId) return 1;
+        return 0;
+      });
+    });
+  }, []);
 
-      const {
-        control,
-        handleSubmit,
-        formState: { errors },
-      } = useForm<FormData>();
+  const clearNewMessages = useCallback((chatId: string) => {
+    setLocalChats((prevChats: ChatData[]) =>
+      prevChats.map((chat: ChatData): ChatData =>
+        chat.chatId === chatId
+          ? { ...chat, numberOfNewMessages: 0 }
+          : chat
+      )
+    );
+  }, []);
 
-      if (isLoading)
-        return (
-          <div className="flex h-screen w-full items-center justify-center">
-            <Spinner />
-          </div>
-        );
-    return ( 
-        <Container>
-            <div className="flex w-full justify-between gap-10 rounded-lg p-4 max-[1180px]:grid max-[1180px]:justify-center">
+  // Effect to clear new messages when a chat is selected
+  useEffect(() => {
+    if (userId) {
+      clearNewMessages(userId);
+    }
+  }, [userId, clearNewMessages]);
+
+  const { isConnected } = useChatListSocket(currentUserId, handleChatUpdate);
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+  const handleOpenModal2 = () => {
+    setModalOpen2(true);
+  };
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+  const handleCloseModal2 = () => {
+    setModalOpen2(false);
+  };
+  const handleClick = (id: string) => {
+    setUserId(id);
+  };
+
+  type FormData = {
+    targetUserId: string;
+  };
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+
+  if (isLoading)
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  return (
+    <Container>
+      <div dir={language === "ar" ? "rtl" : "ltr"} className="flex w-full justify-between gap-10 rounded-lg p-4 max-[1180px]:grid max-[1180px]:justify-center">
         <div className="h-[700px] w-full overflow-y-auto rounded-xl bg-bgPrimary p-5">
           <div className="flex-1 overflow-y-auto">
             {isLoading ? (
@@ -175,12 +175,12 @@ const Chat = () => {
               <>
                 <div className="flex justify-between text-start text-[22px] font-semibold">
                   <h1>{
-                          language === "en"
-                            ? "Contacts"
-                            : language === "ar"
-                              ? "جهات الاتصال"
-                              : "Contacts"
-                        }</h1>
+                    language === "en"
+                      ? "Contacts"
+                      : language === "ar"
+                        ? "جهات الاتصال"
+                        : "Contacts"
+                  }</h1>
                   <button onClick={handleOpenModal}>
                     <svg
                       className="h-8 w-8"
@@ -232,14 +232,14 @@ const Chat = () => {
                   </div>
                 </div>
                 <div className="mt-2 grid gap-2">
-                {localChats
-                .filter((chat: { targetUser: { name: string; }; }) => {
-                  return search.toLocaleLowerCase() === ""
-                    ? chat
-                    : chat.targetUser.name
-                        .toLocaleLowerCase()
-                        .includes(search);
-                })
+                  {localChats
+                    .filter((chat: { targetUser: { name: string; }; }) => {
+                      return search.toLocaleLowerCase() === ""
+                        ? chat
+                        : chat.targetUser.name
+                          .toLocaleLowerCase()
+                          .includes(search);
+                    })
                     .map((chat: any, idx: number) => (
                       <div
                         key={idx}
@@ -368,19 +368,19 @@ const Chat = () => {
               New Chat
               {/* default */}
               <Controller
-                  name="targetUserId"
-                  control={control}
-                  rules={{ required: "School selection is required" }}
-                  defaultValue="" // Initialize with a default value
-                  render={({ field: { onChange, value } }) => (
-                <SearchableSelect
+                name="targetUserId"
+                control={control}
+                rules={{ required: "School selection is required" }}
+                defaultValue="" // Initialize with a default value
+                render={({ field: { onChange, value } }) => (
+                  <SearchableSelect
                     value={value}
                     onChange={onChange}
                     options={optionsRigon}
                     placeholder="Select Chat"
+                  />
+                )}
               />
-                  )}
-                />
 
             </label>
             <button
@@ -388,13 +388,13 @@ const Chat = () => {
               type="submit"
               className="mt-5 w-fit rounded-xl bg-primary px-4 py-2 text-[18px] text-white duration-300 ease-in hover:bg-hover hover:shadow-xl"
             >
-              {isLoading ?  "Adding..." : "Add Chat" }
+              {isLoading ? "Adding..." : "Add Chat"}
             </button>
           </form>
         )}
       </Modal>
-        </Container>
-     );
+    </Container>
+  );
 }
- 
+
 export default Chat;
