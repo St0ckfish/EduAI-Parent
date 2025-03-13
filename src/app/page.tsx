@@ -248,6 +248,7 @@ export default function Home() {
                             aspectRatio="aspect-video"
                             objectFit="cover"
                             priority={true}
+                            key={index} 
                             className="h-full w-full rounded-md object-cover"
                             alt={`Post Image ${index + 1}`}
                             onLoadingComplete={() => console.log('Image loaded')}

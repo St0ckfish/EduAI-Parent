@@ -8,7 +8,7 @@ import { useAllUsersChat, useCreateNewChat, useDeleteChat, useAllChats } from "~
 import { useChatListSocket } from "~/hooks/useRealTimeAllChats";
 import ChatPage from "./chatPage/chat";
 import { useCallback, useEffect, useState } from "react";
-import { useUserDataStore } from "~/APIs/store";
+import useLanguageStore, { useUserDataStore } from "~/APIs/store";
 import { Controller, useForm } from "react-hook-form";
 interface ChatData {
     chatId: string;
@@ -58,7 +58,7 @@ const Chat = () => {
           }
         );
       };
-  
+      const language = useLanguageStore((state) => state.language);
       const onSubmit = (formData: { targetUserId: string }) => {
         createChat(
           { targetUserId: formData.targetUserId },
@@ -174,7 +174,13 @@ const Chat = () => {
             ) : (
               <>
                 <div className="flex justify-between text-start text-[22px] font-semibold">
-                  <h1>Contacts</h1>
+                  <h1>{
+                          language === "en"
+                            ? "Contacts"
+                            : language === "ar"
+                              ? "جهات الاتصال"
+                              : "Contacts"
+                        }</h1>
                   <button onClick={handleOpenModal}>
                     <svg
                       className="h-8 w-8"
