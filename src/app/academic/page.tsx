@@ -21,9 +21,16 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { useGetAllStudents } from "~/APIs/hooks/useGrades";
-import { useGetAllAttendances, useGetAllAttendancesSumm, useGetAllHomeWorks, useGetAllMaterials, useGetAllSchedule } from "~/APIs/hooks/useHomeWork";
+import {
+  useGetAllAttendances,
+  useGetAllAttendancesSumm,
+  useGetAllHomeWorks,
+  useGetAllMaterials,
+  useGetAllSchedule,
+} from "~/APIs/hooks/useHomeWork";
 import Spinner from "~/_components/Spinner";
 import useLanguageStore from "~/APIs/store";
+import { Skeleton } from "~/components/ui/Skeleton";
 
 function CalendarDemo({
   onDateSelect,
@@ -51,9 +58,11 @@ function CalendarDemo({
 
 const Schedule = () => {
   const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
-  const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
+  const [selectedStudent, setSelectedStudent] = useState<string | undefined>(
+    undefined,
+  );
   const { data: students, isLoading: isStudents } = useGetAllStudents();
-  
+
   const formattedDate = React.useMemo(
     () => format(selectedDate, "yyyy-MM-dd"),
     [selectedDate],
@@ -61,117 +70,112 @@ const Schedule = () => {
 
   const language = useLanguageStore((state) => state.language);
 
-const t = (key: string) => {
-  const translations: Record<string, Record<string, string>> = {
-    selectStudent: {
-      en: "Select Student",
-      ar: "اختر الطالب",
-      fr: "Sélectionnez un étudiant",
-    },
-    todayClasses: {
-      en: "Today Classes",
-      ar: "حصص اليوم",
-      fr: "Cours d'aujourd'hui",
-    },
-    subject: {
-      en: "Subject",
-      ar: "الموضوع",
-      fr: "Sujet",
-    },
-    teacher: {
-      en: "Teacher",
-      ar: "المعلم",
-      fr: "Enseignant",
-    },
-    time: {
-      en: "Time",
-      ar: "الوقت",
-      fr: "Heure",
-    },
-    day: {
-      en: "Day",
-      ar: "اليوم",
-      fr: "Jour",
-    },
-    noHomework: {
-      en: "No homework assigned for this date",
-      ar: "لا توجد واجبات منزلية لهذا التاريخ",
-      fr: "Aucun devoir assigné pour cette date",
-    },
-    noMaterials: {
-      en: "No materials assigned for this date",
-      ar: "لا توجد مواد لهذا التاريخ",
-      fr: "Aucun matériel assigné pour cette date",
-    },
-    todayAttendance: {
-      en: "Today's Attendance",
-      ar: "حضور اليوم",
-      fr: "Présence d'aujourd'hui",
-    },
-    attendanceSummary: {
-      en: "Attendance Summary",
-      ar: "ملخص الحضور",
-      fr: "Résumé de la présence",
-    },
-    last30Days: {
-      en: "Last 30 Days",
-      ar: "آخر 30 يومًا",
-      fr: "Les 30 derniers jours",
-    },
-    totalClasses: {
-      en: "Total Classes",
-      ar: "إجمالي الحصص",
-      fr: "Total des cours",
-    },
-    presence: {
-      en: "Presence",
-      ar: "الحضور",
-      fr: "Présence",
-    },
-    absence: {
-      en: "Absence",
-      ar: "الغياب",
-      fr: "Absence",
-    },
-    late: {
-      en: "Late",
-      ar: "متأخر",
-      fr: "En retard",
-    },
-    todayMaterials: {
-      en: "Today's Materials",
-      ar: "مواد اليوم",
-      fr: "Matériaux d'aujourd'hui",
-    },
-    todayHomework: {
-      en: "Today's Homework",
-      ar: "واجب اليوم",
-      fr: "Devoirs d'aujourd'hui",
-    },
-  };
+  const t = (key: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      selectStudent: {
+        en: "Select Student",
+        ar: "اختر الطالب",
+        fr: "Sélectionnez un étudiant",
+      },
+      todayClasses: {
+        en: "Today Classes",
+        ar: "حصص اليوم",
+        fr: "Cours d'aujourd'hui",
+      },
+      subject: {
+        en: "Subject",
+        ar: "الموضوع",
+        fr: "Sujet",
+      },
+      teacher: {
+        en: "Teacher",
+        ar: "المعلم",
+        fr: "Enseignant",
+      },
+      time: {
+        en: "Time",
+        ar: "الوقت",
+        fr: "Heure",
+      },
+      day: {
+        en: "Day",
+        ar: "اليوم",
+        fr: "Jour",
+      },
+      noHomework: {
+        en: "No homework assigned for this date",
+        ar: "لا توجد واجبات منزلية لهذا التاريخ",
+        fr: "Aucun devoir assigné pour cette date",
+      },
+      noMaterials: {
+        en: "No materials assigned for this date",
+        ar: "لا توجد مواد لهذا التاريخ",
+        fr: "Aucun matériel assigné pour cette date",
+      },
+      todayAttendance: {
+        en: "Today's Attendance",
+        ar: "حضور اليوم",
+        fr: "Présence d'aujourd'hui",
+      },
+      attendanceSummary: {
+        en: "Attendance Summary",
+        ar: "ملخص الحضور",
+        fr: "Résumé de la présence",
+      },
+      last30Days: {
+        en: "Last 30 Days",
+        ar: "آخر 30 يومًا",
+        fr: "Les 30 derniers jours",
+      },
+      totalClasses: {
+        en: "Total Classes",
+        ar: "إجمالي الحصص",
+        fr: "Total des cours",
+      },
+      presence: {
+        en: "Presence",
+        ar: "الحضور",
+        fr: "Présence",
+      },
+      absence: {
+        en: "Absence",
+        ar: "الغياب",
+        fr: "Absence",
+      },
+      late: {
+        en: "Late",
+        ar: "متأخر",
+        fr: "En retard",
+      },
+      todayMaterials: {
+        en: "Today's Materials",
+        ar: "مواد اليوم",
+        fr: "Matériaux d'aujourd'hui",
+      },
+      todayHomework: {
+        en: "Today's Homework",
+        ar: "واجب اليوم",
+        fr: "Devoirs d'aujourd'hui",
+      },
+    };
 
-  return translations[key]?.[language] ?? key;
-};
+    return translations[key]?.[language] ?? key;
+  };
 
   const { data: homeworks, isLoading: isHomeworksLoading } = useGetAllHomeWorks(
     selectedStudent,
-    formattedDate
+    formattedDate,
   );
   const { data: materials, isLoading: isMaterials } = useGetAllMaterials(
     selectedStudent,
-    formattedDate
+    formattedDate,
   );
   const { data: attendance } = useGetAllAttendances(
     selectedStudent,
-    formattedDate
+    formattedDate,
   );
-  const { data: attendanceSumm } = useGetAllAttendancesSumm(
-    selectedStudent
-  );
-  const { data: schedule } = useGetAllSchedule(
-    selectedStudent,
-    formattedDate
-  );
+  const { data: attendanceSumm } = useGetAllAttendancesSumm(selectedStudent);
+  const { data: schedule } = useGetAllSchedule(selectedStudent, formattedDate);
 
   useEffect(() => {
     if (students?.data?.length && !selectedStudent) {
@@ -181,18 +185,21 @@ const t = (key: string) => {
 
   return (
     <Container>
-      <div className="flex w-full mb-5">
-        <Select 
-          value={selectedStudent ?? ""} 
+      <div className="mb-5 flex w-full">
+        <Select
+          value={selectedStudent ?? ""}
           onValueChange={setSelectedStudent}
         >
-          <SelectTrigger className="w-[250px] border bg-bgPrimary border-[#f0efef]">
+          <SelectTrigger className="w-[250px] border border-[#f0efef] bg-bgPrimary">
             <SelectValue placeholder={t("selectStudent")} />
           </SelectTrigger>
           {students?.data?.length && (
             <SelectContent>
               {students?.data?.map((student: any) => (
-                <SelectItem key={student.studentId} value={student.studentId.toString()}>
+                <SelectItem
+                  key={student.studentId}
+                  value={student.studentId.toString()}
+                >
                   {student.name}
                 </SelectItem>
               ))}
@@ -229,35 +236,52 @@ const t = (key: string) => {
               </tr>
             </thead>
             <tbody className="rounded-lg">
-              {schedule?.data?.map((item: any) => (
-                <tr 
-                  key={item.id}
-                  className="bg-bgSecondary font-semibold transition hover:bg-primary hover:text-white"
-                >
-                  <th
-                    scope="row"
-                    className="whitespace-nowrap rounded-s-2xl px-6 py-4 font-medium"
-                  >
-                    {item.courseName}
-                  </th>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    {item.teacherName}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    {item.startTime} - {item.endTime}
-                  </td>
-                  <td className="whitespace-nowrap rounded-e-2xl px-6 py-4">
-                    {item.day}
-                  </td>
-                </tr>
-              ))}
+              {schedule?.data?.length
+                ? schedule.data.map((item: any) => (
+                    <tr
+                      key={item.id}
+                      className="bg-bgSecondary font-semibold transition hover:bg-primary hover:text-white"
+                    >
+                      <th
+                        scope="row"
+                        className="whitespace-nowrap rounded-s-2xl px-6 py-4 font-medium"
+                      >
+                        {item.courseName}
+                      </th>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        {item.teacherName}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        {item.startTime} - {item.endTime}
+                      </td>
+                      <td className="whitespace-nowrap rounded-e-2xl px-6 py-4">
+                        {item.day}
+                      </td>
+                    </tr>
+                  ))
+                : [...Array(3)].map((_, i) => (
+                    <tr key={i} className="bg-bgSecondary">
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-4 w-full" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-4 w-full" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-4 w-full" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-4 w-full" />
+                      </td>
+                    </tr>
+                  ))}
             </tbody>
           </table>
         </Box>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-2/5 xl:w-1/3 rounded-xl bg-bgPrimary p-4 shadow h-fit">
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="h-fit w-full rounded-xl bg-bgPrimary p-4 shadow lg:w-2/5 xl:w-1/3">
           <Text font={"bold"} size={"xl"}>
             {t("todayAttendance")}
           </Text>
@@ -272,37 +296,64 @@ const t = (key: string) => {
               <Text font={"semiBold"} color={"gray"}>
                 {t("totalClasses")}
               </Text>
-              <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfAttendances}</Text>
+              {attendanceSumm ? (
+                <Text font={"semiBold"}>
+                  {attendanceSumm?.data?.numberOfAttendances}
+                </Text>
+              ) : (
+                <Skeleton className="h-5 w-10 rounded-md" />
+              )}
             </Box>
             <Box border="borderPrimary">
               <Text font={"semiBold"} color={"gray"}>
                 {t("presence")}
               </Text>
-              <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfPresentAttendances}</Text>
+              {attendanceSumm ? (
+                <Text font={"semiBold"}>
+                  {attendanceSumm?.data?.numberOfPresentAttendances}
+                </Text>
+              ) : (
+                <Skeleton className="h-5 w-10 rounded-md" />
+              )}
             </Box>
             <Box border="borderPrimary">
               <Text font={"semiBold"} color={"gray"}>
                 {t("absence")}
               </Text>
-              <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfAbsentAttendances}</Text>
+              {attendanceSumm ? (
+                <Text font={"semiBold"}>
+                  {attendanceSumm?.data?.numberOfAbsentAttendances}
+                </Text>
+              ) : (
+                <Skeleton className="h-5 w-10 rounded-md" />
+              )}
             </Box>
             <Box border="borderPrimary">
               <Text font={"semiBold"} color={"gray"}>
                 {t("late")}
               </Text>
-              <Text font={"semiBold"}>{attendanceSumm?.data?.numberOfLateAttendances}</Text>
+              {attendanceSumm ? (
+                <Text font={"semiBold"}>
+                  {attendanceSumm?.data?.numberOfLateAttendances}
+                </Text>
+              ) : (
+                <Skeleton className="h-5 w-10 rounded-md" />
+              )}
             </Box>
           </BoxGrid>
         </div>
 
-        <div className="grid w-full h-full gap-10">
-          <div className="w-full rounded-xl bg-bgPrimary p-4 shadow h-fit">
+        <div className="grid h-full w-full gap-10">
+          <div className="h-fit w-full rounded-xl bg-bgPrimary p-4 shadow">
             <Text font={"bold"} size={"xl"} className="mb-8">
               {t("todayMaterials")}
             </Text>
             <div>
               {isMaterials ? (
-                <Spinner/>
+                  <div className="mt-4 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                  </div>
               ) : materials?.data?.content?.length ? (
                 materials.data?.content?.map((material: any, index: number) => (
                   <div key={index} className="mt-4">
@@ -310,7 +361,10 @@ const t = (key: string) => {
                       {material.courseName}
                     </Text>
                     <div className="flex rounded-xl border border-borderPrimary p-2">
-                      <PiLineVertical size={125} className="-ml-12 text-primary" />
+                      <PiLineVertical
+                        size={125}
+                        className="-ml-12 text-primary"
+                      />
                       <div className="-ml-10 mt-2 w-[90%]">
                         <Text size={"xl"}>{material.courseName}</Text>
                         <Text size={"md"}>{material.startTime}</Text>
@@ -325,23 +379,35 @@ const t = (key: string) => {
             </div>
           </div>
 
-          <div className="w-full rounded-xl bg-bgPrimary p-4 shadow h-fit">
+          <div className="h-fit w-full rounded-xl bg-bgPrimary p-4 shadow">
             <Text font={"bold"} size={"xl"} className="mb-8">
               {t("todayHomework")}
             </Text>
             <div>
               {isHomeworksLoading ? (
-                <Spinner/>
+                  <div className="mt-4 space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                  </div>
               ) : homeworks?.data?.content?.length ? (
                 homeworks.data?.content?.map((homework: any, index: number) => (
                   <div key={homework.id} className={index > 0 ? "mt-4" : ""}>
                     <div className="flex rounded-xl border border-borderPrimary p-2">
-                      <PiLineVertical size={125} className="-ml-12 text-primary" />
+                      <PiLineVertical
+                        size={125}
+                        className="-ml-12 text-primary"
+                      />
                       <div className="-ml-10 mt-2 w-[90%]">
-                        <Text size={"xl"} font={"medium"}>{homework.title}</Text>
+                        <Text size={"xl"} font={"medium"}>
+                          {homework.title}
+                        </Text>
                         <Text size={"lg"}>{homework.courseName}</Text>
-                        <Text font={"semiBold"} color={homework.done ? "success" : "error"}>
-                          Deadline: {format(new Date(homework.deadline), "dd MMM (EEEE)")}
+                        <Text
+                          font={"semiBold"}
+                          color={homework.done ? "success" : "error"}
+                        >
+                          Deadline:{" "}
+                          {format(new Date(homework.deadline), "dd MMM (EEEE)")}
                         </Text>
                         <Text color={"gray"} className="my-1">
                           {homework.description}
